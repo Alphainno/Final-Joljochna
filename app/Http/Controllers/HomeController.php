@@ -20,7 +20,10 @@ class HomeController extends Controller
          return view('pages.othersProject');
     }
 
-     public function dashboard(){
+     public function dashboard(Request $request){
+         if (!$request->session()->get('is_admin')) {
+             return redirect()->route('login');
+         }
          return view('admin.dashboard');
     }
 }

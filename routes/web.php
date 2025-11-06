@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\FooterSettingController;
 use App\Http\Controllers\Admin\TestimonialController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\AuthController;
 
 
 Route::get('/', [HomeController::class, 'landingPage'])->name('home');
@@ -31,6 +32,11 @@ Route::get('/api/testimonials', [TestimonialController::class, 'index'])->name('
 Route::post('/admin/testimonials', [TestimonialController::class, 'store'])->name('admin.testimonials.store');
 Route::put('/admin/testimonials/{id}', [TestimonialController::class, 'update'])->name('admin.testimonials.update');
 Route::delete('/admin/testimonials/{id}', [TestimonialController::class, 'destroy'])->name('admin.testimonials.destroy');
+
+// Auth routes (simple session-based)
+Route::get('/login', [AuthController::class, 'loginForm'])->name('login');
+Route::post('/login', [AuthController::class, 'loginSubmit'])->name('login.submit');
+Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 
 
 

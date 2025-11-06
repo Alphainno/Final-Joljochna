@@ -151,6 +151,12 @@
                         });
                     }
                 }
+                // If navigating to Home > Testimonials editor, broadcast a signal so the public site refreshes its carousel
+                try {
+                    if (tabId === 'home' && sectionId === 'home-testimonials') {
+                        localStorage.setItem('refreshTestimonials', String(Date.now()));
+                    }
+                } catch (e) { /* ignore */ }
                 // Special case: for Home > Hero, scroll to top of Home tab
                 const target = (tabId === 'home' && sectionId === 'home-hero')
                     ? document.getElementById('home')
@@ -427,6 +433,8 @@
                 renderBookingsTable(bookingsData);
                 renderOverview();
                 alertUser('সফল', 'বুকিং সফলভাবে মুছে ফেলা হয়েছে।');
+                loadTestimonials();
+                try { localStorage.setItem('refreshTestimonials', String(Date.now())); } catch (e) {}
             } else {
                  alertUser('ত্রুটি', 'বুকিং খুঁজে পাওয়া যায়নি।');
             }
@@ -659,7 +667,7 @@
             legalTermsLabel: 'সেবার শর্তাবলী', legalTermsHref: '#terms',
             socialFacebook: '#', socialInstagram: '#', socialTwitter: '#', socialLinkedin: '#', socialYouTube: '#',
             mapUrl: '#',
-            bottomText: '© ২০২৫ জলজোছনা। সর্বস্বত্ব সংরক্ষিত। | NEX Real Estate এর একটি প্রকল্প',
+            bottomText: ' 2025 জলজোছনা। সর্বস্বত্ব সংরক্ষিত। | NEX Real Estate এর একটি প্রকল্প',
             qrDataUrl: '/images/alphainno-qr-code.png',
             qrSectionTitle: 'অবস্থান দেখুন',
             mapButtonText: 'গুগল ম্যাপে দেখুন',
@@ -1032,6 +1040,15 @@
         function alertUser(title, message) {
             showModal(title, message, [{text: 'ঠিক আছে', action: closeModal}]);
         }
+
+        // Global helper: perform logout redirect
+        window.logoutNow = function(){
+            try {
+                window.location = '/logout';
+            } catch (e) {
+                window.location.href = '/logout';
+            }
+        };
 
 
         // Initial setup on window load

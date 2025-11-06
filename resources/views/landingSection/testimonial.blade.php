@@ -119,6 +119,15 @@
                 
                 // Reload on focus (user clicks back to the page)
                 window.addEventListener('focus', loadTestimonials);
+
+                // Reload when admin dashboard broadcasts a refresh via localStorage
+                window.addEventListener('storage', function(e){
+                    try{
+                        if (e && e.key === 'refreshTestimonials') {
+                            loadTestimonials();
+                        }
+                    }catch(err){ /* ignore */ }
+                });
             })();
         </script>
 
