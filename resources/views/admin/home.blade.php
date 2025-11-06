@@ -550,4 +550,92 @@
         </div>
     </div>
 
+    <div id="home-projects" style="margin-top:1rem;">
+        <div class="table-card">
+            <h2>অন্যান্য প্রকল্প</h2>
+            <style>
+                #home-projects .proj-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+                #home-projects .proj-form input[type="text"],
+                #home-projects .proj-form input[type="url"],
+                #home-projects .proj-form textarea { height:46px; padding:10px 12px; font-size:15px; border-radius:10px; }
+                #home-projects .proj-card { border:1px solid #e5e7eb; border-radius:12px; padding:12px; background:#fafafa }
+                #home-projects .proj-card h4 { margin:0 0 8px; font-size:14px; font-weight:600; }
+                #home-projects .preview-box{ border:1px dashed #cbd5e1; border-radius:12px; padding:12px; background:#f8fafc; }
+                @media (max-width: 960px){ #home-projects .proj-grid{ grid-template-columns:1fr } }
+            </style>
+            <div class="proj-grid">
+                <div class="proj-form">
+                    <div class="form-group" style="margin-bottom:8px;">
+                        <label>সেকশন শিরোনাম</label>
+                        <input type="text" id="opTitle" placeholder="অন্যান্য প্রকল্প" />
+                    </div>
+                    <div class="form-group" style="margin-bottom:12px;">
+                        <label>সেকশন সাব-শিরোনাম</label>
+                        <input type="text" id="opSubtitle" placeholder="NEX Real Estate-এর সফল প্রকল্পগুলো দেখুন" />
+                    </div>
+                    <div id="opForms"></div>
+                    <div style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap;">
+                        <button id="addProjectBtn" class="btn btn-primary" type="button">নতুন প্রকল্প যোগ করুন</button>
+                        <button id="saveOtherProjectsBtn" class="btn btn-primary" type="button">সেভ</button>
+                        <button id="resetOtherProjectsBtn" class="btn btn-secondary" type="button">রিসেট</button>
+                    </div>
+                </div>
+                <div>
+                    <div class="preview-box">
+                        <div style="margin-bottom:8px;">
+                            <div id="pvOpTitle" style="font-weight:700; font-size:20px;">অন্যান্য প্রকল্প</div>
+                            <div id="pvOpSubtitle" style="color:#64748b;">NEX Real Estate-এর সফল প্রকল্পগুলো দেখুন</div>
+                        </div>
+                        <div id="pvOpList" style="display:grid; grid-template-columns:1fr 1fr; gap:12px;"></div>
+                    </div>
+                </div>
+            </div>
+            <script>
+                (function(){
+                    function get(){ try{ return JSON.parse(localStorage.getItem('otherProjectsSettings')||'{}'); }catch(e){ return {}; } }
+                    function set(data){ localStorage.setItem('otherProjectsSettings', JSON.stringify(data)); window.dispatchEvent(new StorageEvent('storage', {key:'otherProjectsSettings', newValue: JSON.stringify(data)})); }
+                    const els = { title: document.getElementById('opTitle'), subtitle: document.getElementById('opSubtitle') };
+                    const formsWrap = document.getElementById('opForms');
+                    const listWrap  = document.getElementById('pvOpList');
+                    function normalizeLegacy(v){
+                        if(Array.isArray(v.items)) return v;
+                        const items=[]; for(let i=1;i<=12;i++){ const name=v['name'+i],icon=v['icon'+i],desc=v['desc'+i],btn=v['btn'+i],href=v['href'+i]; if(name||icon||desc||btn||href){ items.push({icon:icon||'',name:name||'',desc:desc||'',btn:btn||'',href:href||''}); } }
+                        return { title:v.title||'', subtitle:v.subtitle||'', items };
+                    }
+                    function projectFormTemplate(idx, d){ return `
+                        <div class="proj-card" data-index="${idx}" style="margin-top:12px;">
+                            <div style=\"display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;\">
+                                <h4 style=\"margin:0;\">প্রকল্প ${idx+1}</h4>
+                                <button type=\"button\" class=\"btn btn-secondary\" data-remove=\"${idx}\" style=\"background:#ef4444; border-color:#ef4444;\">মুছুন</button>
+                            </div>
+                            <input type=\"text\" data-field=\"icon\" placeholder=\"আইকন (যেমন: 🏙️)\" value=\"${(d&&d.icon)||''}\" />
+                            <input type=\"text\" data-field=\"name\" placeholder=\"নাম\" style=\"margin-top:8px;\" value=\"${(d&&d.name)||''}\" />
+                            <textarea data-field=\"desc\" placeholder=\"বিবরণ\" style=\"margin-top:8px; height:90px;\">${(d&&d.desc)||''}</textarea>
+                            <div style=\"display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:8px;\">
+                                <input type=\"text\" data-field=\"btn\" placeholder=\"বাটন টেক্সট\" value=\"${(d&&d.btn)||''}\" />
+                                <input type=\"url\" data-field=\"href\" placeholder=\"লিংক\" value=\"${(d&&d.href)||''}\" />
+                            </div>
+                        </div>`; }
+                    function renderForms(v){ formsWrap.innerHTML=''; (v.items||[]).forEach((it,idx)=>{ formsWrap.insertAdjacentHTML('beforeend', projectFormTemplate(idx,it)); }); bindFormHandlers(); }
+                    function renderPreview(v){
+                        document.getElementById('pvOpTitle').textContent = v.title || 'অন্যান্য প্রকল্প';
+                        document.getElementById('pvOpSubtitle').textContent = v.subtitle || 'NEX Real Estate-এর সফল প্রকল্পগুলো দেখুন';
+                        listWrap.innerHTML='';
+                        const items = (v.items&&v.items.length)? v.items: [{icon:'🏙️',name:'শান্তি নিবাস',desc:'শহরের ঠিক মাঝে আপনার শান্তির ঠিকানা...',btn:'বিস্তারিত জানুন',href:'#contact'}];
+                        items.forEach(p=>{ const card=document.createElement('div'); card.style.border='1px solid #e5e7eb'; card.style.borderRadius='10px'; card.style.padding='10px'; card.style.background='#fff'; card.innerHTML=`<div style=\"font-size:28px;\">${p.icon||''}</div><div style=\"font-weight:600; margin-top:4px;\">${p.name||''}</div><div style=\"color:#475569; font-size:14px; margin-top:4px;\">${p.desc||''}</div><a href=\"${p.href||'#contact'}\" class=\"btn btn-primary\" style=\"margin-top:8px; display:inline-block;\">${p.btn||'বিস্তারিত জানুন'}</a>`; listWrap.appendChild(card); });
+                    }
+                    function current(){ return normalizeLegacy(get()); }
+                    function save(v){ set(v); renderPreview(v); }
+                    function bindHeaderInputs(v){ els.title.value=v.title||''; els.subtitle.value=v.subtitle||''; ['input','change'].forEach(ev=>{ els.title.addEventListener(ev, ()=>{ const n=current(); n.title=els.title.value; save(n); }); els.subtitle.addEventListener(ev, ()=>{ const n=current(); n.subtitle=els.subtitle.value; save(n); }); }); }
+                    function bindFormHandlers(){ formsWrap.querySelectorAll('.proj-card').forEach((card, idx)=>{ card.querySelectorAll('[data-field]').forEach(inp=>{ ['input','change'].forEach(ev=> inp.addEventListener(ev, ()=>{ const v=current(); v.items[idx][inp.dataset.field]=inp.value; save(v); })); }); const rm=card.querySelector('[data-remove]'); rm&&rm.addEventListener('click', ()=>{ const v=current(); v.items.splice(idx,1); set(v); renderForms(v); renderPreview(v); }); }); }
+                    document.getElementById('addProjectBtn').addEventListener('click', ()=>{ const v=current(); if(!Array.isArray(v.items)) v.items=[]; v.items.push({icon:'🏙️',name:'',desc:'',btn:'বিস্তারিত জানুন',href:'#contact'}); set(v); renderForms(v); renderPreview(v); });
+                    document.getElementById('saveOtherProjectsBtn').addEventListener('click', ()=>{ const v=current(); set(v); if(typeof alertUser==='function'){ alertUser('সফল','অন্যান্য প্রকল্প সংরক্ষণ করা হয়েছে।'); } });
+                    document.getElementById('resetOtherProjectsBtn').addEventListener('click', ()=>{ localStorage.removeItem('otherProjectsSettings'); const v={title:'',subtitle:'',items:[]}; renderForms(v); renderPreview(v); window.dispatchEvent(new StorageEvent('storage', {key:'otherProjectsSettings', newValue: null})); });
+                    const initial=current(); bindHeaderInputs(initial); renderForms(initial); renderPreview(initial);
+                })();
+                })();
+            </script>
+        </div>
+    </div>
+
 </div>

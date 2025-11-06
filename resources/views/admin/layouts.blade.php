@@ -7,7 +7,9 @@
     <!-- Chart.js Library for Data Visualization -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <link rel="stylesheet" href="{{ asset('assets/admin/style.css') }}">
+    @if (file_exists(public_path('build/manifest.json')))
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @endif
    
 </head>
 <body>
