@@ -6,70 +6,7 @@
             <button id="prevTestimonialBtn" class="carousel-btn prev-btn">❮</button>
             <div class="carousel-container">
                 <div id="testimonialTrack" class="carousel-track">
-
-                    <div class="testimonial-card" data-testimonial-index="0">
-                        <!-- Investor Info (LEFT Column) -->
-                        <div class="investor-meta">
-                            <div class="investor-avatar test-avatar">FA</div>
-                            <div>
-                                <div class="investor-name test-name">জনাব. ফারহান আহমেদ</div>
-                                <div class="investor-title test-title">ব্যবসায়ী, ঢাকা</div>
-                            </div>
-                        </div>
-                        <!-- Quote Content (RIGHT Column) -->
-                        <div class="quote-content-wrapper">
-                            <span class="quote-icon">❝</span>
-                            <p class="quote-text test-quote">জলজোছনা প্রকল্প দেখে আমি সত্যিই মুগ্ধ! দারুণ লোকেশন, আর পেমেন্ট
-                                প্ল্যানগুলো খুবই নমনীয়। আমার বিনিয়োগের সেরা সিদ্ধান্ত ছিল।</p>
-                        </div>
-                    </div>
-
-                    <div class="testimonial-card" data-testimonial-index="1">
-                        <div class="investor-meta">
-                            <div class="investor-avatar test-avatar">JF</div>
-                            <div>
-                                <div class="investor-name test-name">মিসেস. জান্নাতুল ফেরদৌস</div>
-                                <div class="investor-title test-title">গৃহিণী, খুলনা</div>
-                            </div>
-                        </div>
-                        <div class="quote-content-wrapper">
-                            <span class="quote-icon">❝</span>
-                            <p class="quote-text test-quote">নেক্স রিয়েল এস্টেট এর সাথে কাজ করা সহজ ছিল। সমস্ত আইনি ডকুমেন্টেশন
-                                পরিষ্কার এবং দ্রুত সম্পন্ন হয়েছে। আমি অন্য প্রকল্পে বিনিয়োগের পরিকল্পনা করছি।</p>
-                        </div>
-                    </div>
-
-                    <div class="testimonial-card" data-testimonial-index="2">
-                        <div class="investor-meta">
-                            <div class="investor-avatar test-avatar">SR</div>
-                            <div>
-                                <div class="investor-name test-name">জনাব. শফিকুর রহমান</div>
-                                <div class="investor-title test-title">প্রকৌশলী, যুক্তরাজ্য</div>
-                            </div>
-                        </div>
-                        <div class="quote-content-wrapper">
-                            <span class="quote-icon">❝</span>
-                            <p class="quote-text test-quote">পরিকল্পিত সবুজ পরিবেশ এবং যোগাযোগ ব্যবস্থা খুবই চমৎকার। ভবিষ্যতের
-                                জন্য এটি একটি নিরাপদ ও লাভজনক বিনিয়োগ। আমি ১০০% সন্তুষ্ট।</p>
-                        </div>
-                    </div>
-
-                    <!-- Added one more for effect -->
-                    <div class="testimonial-card" data-testimonial-index="3">
-                        <div class="investor-meta">
-                            <div class="investor-avatar test-avatar">AK</div>
-                            <div>
-                                <div class="investor-name test-name">মিসেস. আয়েশা খানম</div>
-                                <div class="investor-title test-title">শিক্ষিকা, চট্টগ্রাম</div>
-                            </div>
-                        </div>
-                        <div class="quote-content-wrapper">
-                            <span class="quote-icon">❝</span>
-                            <p class="quote-text test-quote">প্রকল্পের অবস্থান ও উন্নত যোগাযোগ আমাকে আকর্ষণ করেছে। বুকিং
-                                প্রক্রিয়া খুবই সহজ ছিল। আমি আমার বন্ধুদেরও এখানে বিনিয়োগ করতে উৎসাহিত করব।</p>
-                        </div>
-                    </div>
-
+                    <!-- Testimonials will be loaded dynamically from database -->
                 </div>
             </div>
             <button id="nextTestimonialBtn" class="carousel-btn next-btn">❯</button>
@@ -77,28 +14,111 @@
 
         <script>
             (function(){
-                const cards = Array.from(document.querySelectorAll('.testimonial-card'));
-                function readTestimonials(){ try{ return JSON.parse(localStorage.getItem('testimonialsSettings')||'{}'); }catch(e){ return {}; } }
-                function applyTestimonials(){
-                    const s = readTestimonials();
-                    const items = Array.isArray(s.items) ? s.items : [];
-                    cards.forEach((card, idx) => {
-                        const item = items[idx];
-                        if (!item) return;
-                        const avatarEl = card.querySelector('.test-avatar');
-                        const nameEl = card.querySelector('.test-name');
-                        const titleEl = card.querySelector('.test-title');
-                        const quoteEl = card.querySelector('.test-quote');
-                        if (avatarEl && item.avatar) avatarEl.textContent = item.avatar;
-                        if (nameEl && item.name) nameEl.textContent = item.name;
-                        if (titleEl && item.title) titleEl.textContent = item.title;
-                        if (quoteEl && item.quote) quoteEl.textContent = item.quote;
+                const track = document.getElementById('testimonialTrack');
+                const prevBtn = document.getElementById('prevTestimonialBtn');
+                const nextBtn = document.getElementById('nextTestimonialBtn');
+                let currentIndex = 0;
+                let testimonials = [];
+
+                async function loadTestimonials() {
+                    try {
+                        const response = await fetch('/api/testimonials');
+                        testimonials = await response.json();
+                        renderTestimonials();
+                        initCarousel();
+                    } catch (error) {
+                        console.error('Error loading testimonials:', error);
+                    }
+                }
+
+                function renderTestimonials() {
+                    if (!track) return;
+                    
+                    track.innerHTML = '';
+                    
+                    if (testimonials.length === 0) {
+                        track.innerHTML = '<div class="testimonial-card"><p style="text-align:center; padding:2rem;">কোন মন্তব্য পাওয়া যায়নি</p></div>';
+                        return;
+                    }
+
+                    testimonials.forEach((testimonial, index) => {
+                        const card = document.createElement('div');
+                        card.className = 'testimonial-card';
+                        card.dataset.testimonialIndex = index;
+                        
+                        // Use image if available, otherwise use avatar text
+                        let avatarHtml = '';
+                        if (testimonial.image_url) {
+                            avatarHtml = `<img src="${testimonial.image_url}" alt="${testimonial.name || ''}" class="investor-avatar-image" style="width:100px; height:100px; border-radius:50%; object-fit:cover; border:3px solid #0a4d2e; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);" />`;
+                        } else {
+                            avatarHtml = `<div class="investor-avatar test-avatar">${testimonial.avatar || ''}</div>`;
+                        }
+                        
+                        card.innerHTML = `
+                            <div class="investor-meta">
+                                ${avatarHtml}
+                                <div>
+                                    <div class="investor-name test-name">${testimonial.name || ''}</div>
+                                    <div class="investor-title test-title">${testimonial.title || ''}</div>
+                                </div>
+                            </div>
+                            <div class="quote-content-wrapper">
+                                <span class="quote-icon">❝</span>
+                                <p class="quote-text test-quote">${testimonial.quote || ''}</p>
+                            </div>
+                        `;
+                        track.appendChild(card);
                     });
                 }
-                applyTestimonials();
-                window.addEventListener('storage', (e)=>{ if(e.key==='testimonialsSettings') applyTestimonials(); });
-                let last = localStorage.getItem('testimonialsSettings');
-                setInterval(()=>{ const cur = localStorage.getItem('testimonialsSettings'); if(cur!==last){ last=cur; applyTestimonials(); } }, 1000);
+
+                function initCarousel() {
+                    if (testimonials.length <= 1) {
+                        if (prevBtn) prevBtn.style.display = 'none';
+                        if (nextBtn) nextBtn.style.display = 'none';
+                        return;
+                    }
+
+                    if (prevBtn) prevBtn.style.display = 'block';
+                    if (nextBtn) nextBtn.style.display = 'block';
+
+                    function updateCarousel() {
+                        if (!track) return;
+                        const cardWidth = track.querySelector('.testimonial-card')?.offsetWidth || 0;
+                        const offset = -currentIndex * cardWidth;
+                        track.style.transform = `translateX(${offset}px)`;
+                    }
+
+                    if (prevBtn) {
+                        prevBtn.onclick = () => {
+                            currentIndex = (currentIndex - 1 + testimonials.length) % testimonials.length;
+                            updateCarousel();
+                        };
+                    }
+
+                    if (nextBtn) {
+                        nextBtn.onclick = () => {
+                            currentIndex = (currentIndex + 1) % testimonials.length;
+                            updateCarousel();
+                        };
+                    }
+
+                    updateCarousel();
+                }
+
+                loadTestimonials();
+                
+                // Reload testimonials every 3 seconds to get updates
+                setInterval(loadTestimonials, 3000);
+                
+                // Also reload when page becomes visible (user switches tabs back)
+                document.addEventListener('visibilitychange', function() {
+                    if (!document.hidden) {
+                        loadTestimonials();
+                    }
+                });
+                
+                // Reload on focus (user clicks back to the page)
+                window.addEventListener('focus', loadTestimonials);
             })();
         </script>
 

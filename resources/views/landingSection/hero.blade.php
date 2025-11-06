@@ -8,14 +8,18 @@
             #home .slides img.active{opacity:1}
             #home .overlay{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; padding:24px}
             #home .overlay::after{content:""; position:absolute; inset:0; background:linear-gradient(180deg, rgba(0,0,0,.35), rgba(0,0,0,.55));}
-            #home .overlay-content{position:relative; z-index:1; text-align:center; color:#fff; max-width:920px}
-            #home .overlay-content h1{font-size:42px; font-weight:800; margin:0 0 8px}
-            #home .overlay-content h2{font-size:28px; font-weight:700; margin:0 0 10px}
-            #home .overlay-content .hero-subtitle{opacity:.95; margin-bottom:16px}
-            #home .overlay-content .cta-buttons{display:flex; gap:12px; justify-content:center}
-            #home .overlay-content .btn{padding:10px 16px; border-radius:10px; font-weight:600}
+            #home .overlay-content{position:relative; z-index:1; text-align:center; color:#fff; max-width:980px; padding:0 12px}
+            #home .overlay-content h1{font-size:clamp(28px, 5vw, 56px); line-height:1.1; font-weight:800; margin:0 0 10px}
+            #home .overlay-content h2{font-size:clamp(18px, 3.2vw, 32px); line-height:1.25; font-weight:700; margin:0 0 12px}
+            #home .overlay-content .hero-subtitle{opacity:.95; margin-bottom:18px; font-size:clamp(14px, 2.4vw, 18px)}
+            #home .overlay-content .cta-buttons{display:flex; gap:12px; justify-content:center; flex-wrap:wrap}
+            #home .overlay-content .btn{padding:clamp(10px, 1.5vw, 14px) clamp(14px, 2.2vw, 20px); border-radius:12px; font-weight:700; font-size:clamp(14px, 2.4vw, 16px); transition:transform .15s ease, box-shadow .2s ease, background-color .2s ease}
+            #home .overlay-content .btn-primary{background:#16a34a; color:#ffffff; border:none; box-shadow:0 6px 14px rgba(22,163,74,.35)}
+            #home .overlay-content .btn-primary:hover{transform:translateY(-1px); box-shadow:0 10px 20px rgba(22,163,74,.45); background:#22c55e}
+            #home .overlay-content .btn-primary:active{transform:translateY(0); box-shadow:0 4px 10px rgba(22,163,74,.35); background:#15803d}
+            #home .overlay-content .btn-primary:focus{outline:2px solid rgba(34,197,94,.85); outline-offset:2px}
             /* Yellow, modern, smooth button for Contact */
-            #home .overlay-content .btn-secondary{background:#ffd700; color:#000000; border:none; box-shadow:0 6px 14px rgba(255,215,0,.35); transition:transform .15s ease, box-shadow .2s ease, background-color .2s ease}
+            #home .overlay-content .btn-secondary{background:#ffd700; color:#000000; border:none; box-shadow:0 6px 14px rgba(255,215,0,.35)}
             #home .overlay-content .btn-secondary:hover{transform:translateY(-1px); box-shadow:0 10px 20px rgba(255,215,0,.45); background:#ffe057}
             #home .overlay-content .btn-secondary:active{transform:translateY(0); box-shadow:0 4px 10px rgba(255,215,0,.35); background:#f0c800}
             #home .overlay-content .btn-secondary:focus{outline:2px solid rgba(255,215,0,.8); outline-offset:2px}
@@ -25,7 +29,15 @@
             #home .slider-dot{width:10px; height:10px; border-radius:999px; background:rgba(255,255,255,.5); cursor:pointer}
             #home .slider-dot.active{background:#ffd700}
             #home .scroll-indicator{position:absolute; bottom:8px; left:0; right:0}
-            @media (max-width: 768px){ #home .overlay-content h1{font-size:28px} #home .overlay-content h2{font-size:20px} #home .slider-wrap{height:64vh} }
+            @media (max-width: 768px){
+                #home .slider-wrap{height:64vh}
+                #home .overlay-content .cta-buttons{gap:10px}
+                #home .overlay-content .cta-buttons .btn{width:100%; max-width:420px}
+            }
+            @media (max-width: 420px){
+                #home .overlay{padding:16px}
+                #home .overlay-content{padding:0 6px}
+            }
         </style>
 
         <div class="slider-wrap">

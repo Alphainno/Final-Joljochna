@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\FooterSettingController;
+use App\Http\Controllers\Admin\TestimonialController;
 use App\Http\Controllers\HomeController;
 
 
@@ -24,6 +25,12 @@ Route::get('/api/footer-settings', function() {
     }
     return response()->json($settings);
 })->name('api.footer-settings');
+
+// Testimonials API routes
+Route::get('/api/testimonials', [TestimonialController::class, 'index'])->name('api.testimonials.index');
+Route::post('/admin/testimonials', [TestimonialController::class, 'store'])->name('admin.testimonials.store');
+Route::put('/admin/testimonials/{id}', [TestimonialController::class, 'update'])->name('admin.testimonials.update');
+Route::delete('/admin/testimonials/{id}', [TestimonialController::class, 'destroy'])->name('admin.testimonials.destroy');
 
 
 

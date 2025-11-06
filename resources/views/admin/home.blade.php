@@ -453,98 +453,415 @@
 
     <div id="home-testimonials" style="margin-top:1rem;">
         <div class="table-card">
-            <h2>বিনিয়োগকারী মন্তব্য</h2>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+                <h2 style="margin:0;">বিনিয়োগকারী মন্তব্য</h2>
+                <button id="addTestimonialBtn" class="btn btn-primary" type="button" style="display:flex; align-items:center; gap:8px;">
+                    <span>+</span>
+                    <span>মন্তব্য যোগ করুন</span>
+                </button>
+            </div>
             <style>
                 #home-testimonials .testimonials-form input[type="text"],
-                #home-testimonials .testimonials-form textarea { height: 46px; padding:10px 12px; font-size:15px; border-radius:10px; }
-                #home-testimonials .testimonials-grid-editor { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
-                #home-testimonials .card-editor { border:1px solid #e5e7eb; border-radius:12px; padding:12px; background:#fafafa }
-                #home-testimonials .card-editor h4 { margin:0 0 8px; font-size:14px }
-                @media (max-width: 960px){ #home-testimonials .testimonials-grid-editor{ grid-template-columns:1fr } }
+                #home-testimonials .testimonials-form textarea { 
+                    height: 46px; 
+                    padding:10px 12px; 
+                    font-size:15px; 
+                    border-radius:10px; 
+                    width: 100%;
+                    border: 1px solid #e5e7eb;
+                    box-sizing: border-box;
+                }
+                #home-testimonials .testimonials-form textarea { 
+                    height: auto; 
+                    min-height: 80px; 
+                    resize: vertical;
+                }
+                #home-testimonials .testimonials-grid-editor { 
+                    display:grid; 
+                    grid-template-columns:repeat(2,1fr); 
+                    gap:12px; 
+                }
+                #home-testimonials .card-editor { 
+                    border:1px solid #e5e7eb; 
+                    border-radius:12px; 
+                    padding:12px; 
+                    background:#fafafa;
+                    position: relative;
+                }
+                #home-testimonials .card-editor h4 { 
+                    margin:0 0 8px; 
+                    font-size:14px;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                }
+                #home-testimonials .card-editor .delete-btn {
+                    background: #ef4444;
+                    color: white;
+                    border: none;
+                    padding: 10px 16px;
+                    border-radius: 6px;
+                    cursor: pointer;
+                    font-size: 14px;
+                    font-weight: 500;
+                    transition: background 0.2s;
+                }
+                #home-testimonials .card-editor .delete-btn:hover {
+                    background: #dc2626;
+                }
+                @media (max-width: 960px){ 
+                    #home-testimonials .testimonials-grid-editor{ grid-template-columns:1fr } 
+                }
             </style>
             <div class="testimonials-form">
-                <div class="testimonials-grid-editor">
-                    <div class="card-editor">
-                        <h4>মন্তব্য ১</h4>
-                        <input type="text" id="testAvatar1" placeholder="অবতার (যেমন: FA)" />
-                        <input type="text" id="testName1" placeholder="নাম" style="margin-top:8px;" />
-                        <input type="text" id="testTitle1" placeholder="পদবি / অবস্থান" style="margin-top:8px;" />
-                        <textarea id="testQuote1" placeholder="উক্তি" style="margin-top:8px;"></textarea>
+                <div id="testimonialsContainer" class="testimonials-grid-editor">
+                    <!-- Testimonials will be loaded here dynamically -->
                     </div>
-                    <div class="card-editor">
-                        <h4>মন্তব্য ২</h4>
-                        <input type="text" id="testAvatar2" placeholder="অবতার (যেমন: JF)" />
-                        <input type="text" id="testName2" placeholder="নাম" style="margin-top:8px;" />
-                        <input type="text" id="testTitle2" placeholder="পদবি / অবস্থান" style="margin-top:8px;" />
-                        <textarea id="testQuote2" placeholder="উক্তি" style="margin-top:8px;"></textarea>
                     </div>
-                    <div class="card-editor">
-                        <h4>মন্তব্য ৩</h4>
-                        <input type="text" id="testAvatar3" placeholder="অবতার (যেমন: SR)" />
-                        <input type="text" id="testName3" placeholder="নাম" style="margin-top:8px;" />
-                        <input type="text" id="testTitle3" placeholder="পদবি / অবস্থান" style="margin-top:8px;" />
-                        <textarea id="testQuote3" placeholder="উক্তি" style="margin-top:8px;"></textarea>
-                    </div>
-                    <div class="card-editor">
-                        <h4>মন্তব্য ৪</h4>
-                        <input type="text" id="testAvatar4" placeholder="অবতার (যেমন: AK)" />
-                        <input type="text" id="testName4" placeholder="নাম" style="margin-top:8px;" />
-                        <input type="text" id="testTitle4" placeholder="পদবি / অবস্থান" style="margin-top:8px;" />
-                        <textarea id="testQuote4" placeholder="উক্তি" style="margin-top:8px;"></textarea>
-                    </div>
-                </div>
-                <div style="margin-top:14px; display:flex; gap:10px;">
-                    <button id="saveTestimonialsBtn" class="btn btn-primary" type="button">সেভ</button>
-                    <button id="resetTestimonialsBtn" class="btn btn-secondary" type="button">রিসেট</button>
-                </div>
-            </div>
             <script>
                 (function(){
-                    const ids = ['1','2','3','4'];
-                    const getInputs = () => ids.map(i=>({
-                        avatar: document.getElementById('testAvatar'+i),
-                        name: document.getElementById('testName'+i),
-                        title: document.getElementById('testTitle'+i),
-                        quote: document.getElementById('testQuote'+i)
-                    }));
-                    function load(){
-                        try{
-                            const saved = JSON.parse(localStorage.getItem('testimonialsSettings')||'{}');
-                            const items = Array.isArray(saved.items)? saved.items: [];
-                            const inputs = getInputs();
-                            inputs.forEach((g, idx)=>{
-                                const it = items[idx] || {};
-                                g.avatar.value = it.avatar || '';
-                                g.name.value = it.name || '';
-                                g.title.value = it.title || '';
-                                g.quote.value = it.quote || '';
+                    // Define notification function FIRST so it's always available
+                    window.showGreenNotification = function(title, message) {
+                        try {
+                            // Remove existing notification if any
+                            const existing = document.getElementById('testimonial-success-notification');
+                            if (existing) {
+                                existing.remove();
+                            }
+
+                            // Create notification element - positioned at top center of website
+                            const notification = document.createElement('div');
+                            notification.id = 'testimonial-success-notification';
+                            notification.style.cssText = `
+                                position: fixed;
+                                top: 20px;
+                                left: 50%;
+                                transform: translateX(-50%);
+                                background: #10b981;
+                                color: white;
+                                padding: 16px 24px;
+                                border-radius: 8px;
+                                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                                z-index: 10000;
+                                display: flex;
+                                align-items: center;
+                                gap: 12px;
+                                min-width: 300px;
+                                max-width: 500px;
+                                text-align: center;
+                            `;
+                            notification.innerHTML = `
+                                <div style="font-size: 24px; flex-shrink: 0;">✓</div>
+                                <div style="flex: 1;">
+                                    <div style="font-weight: 600; margin-bottom: 4px; font-size: 16px;">${title}</div>
+                                    <div style="font-size: 14px; opacity: 0.95; line-height: 1.4;">${message}</div>
+                    </div>
+                            `;
+
+                            // Add animation style if not exists
+                            if (!document.getElementById('testimonial-notification-style')) {
+                                const style = document.createElement('style');
+                                style.id = 'testimonial-notification-style';
+                                style.textContent = `
+                                    @keyframes slideDown {
+                                        from {
+                                            transform: translateX(-50%) translateY(-100%);
+                                            opacity: 0;
+                                        }
+                                        to {
+                                            transform: translateX(-50%) translateY(0);
+                                            opacity: 1;
+                                        }
+                                    }
+                                    #testimonial-success-notification {
+                                        animation: slideDown 0.3s ease;
+                                    }
+                                `;
+                                document.head.appendChild(style);
+                            }
+
+                            document.body.appendChild(notification);
+
+                            // Auto remove after 5 seconds
+                            setTimeout(() => {
+                                if (notification.parentNode) {
+                                    notification.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+                                    notification.style.transform = 'translateX(-50%) translateY(-100%)';
+                                    notification.style.opacity = '0';
+                                    setTimeout(() => {
+                                        if (notification.parentNode) {
+                                            notification.remove();
+                                        }
+                                    }, 300);
+                                }
+                            }, 5000);
+                        } catch (error) {
+                            console.error('Error showing notification:', error);
+                            // Fallback to alert
+                            alert(title + ': ' + message);
+                        }
+                    };
+
+                    const container = document.getElementById('testimonialsContainer');
+                    let testimonials = [];
+                    let testimonialCounter = 0;
+
+                    function createTestimonialCard(testimonial = null, index = null) {
+                        const id = testimonial ? testimonial.id : 'new_' + (++testimonialCounter);
+                        const isNew = !testimonial;
+                        const displayIndex = index !== null ? index + 1 : (testimonials.length + 1);
+                        const card = document.createElement('div');
+                        card.className = 'card-editor';
+                        card.dataset.testimonialId = id;
+                        const escapedAvatar = (testimonial?.avatar || '').replace(/"/g, '&quot;');
+                        const escapedName = (testimonial?.name || '').replace(/"/g, '&quot;');
+                        const escapedTitle = (testimonial?.title || '').replace(/"/g, '&quot;');
+                        const escapedQuote = (testimonial?.quote || '').replace(/"/g, '&quot;').replace(/\n/g, '&#10;');
+                        const imageUrl = testimonial?.image_url || '';
+                        card.innerHTML = `
+                            <h4>
+                                <span>মন্তব্য ${displayIndex}</span>
+                            </h4>
+                            <div style="margin-bottom:8px;">
+                                <label style="display:block; margin-bottom:4px; font-size:13px; font-weight:500;">ছবি আপলোড করুন</label>
+                                <input type="file" class="test-image" accept="image/*" style="width:100%; padding:6px; border:1px solid #e5e7eb; border-radius:6px;" onchange="previewTestimonialImage(this, ${id})" />
+                                <div class="image-preview-${id}" style="margin-top:8px;">
+                                    ${imageUrl ? `<img src="${imageUrl}" alt="Preview" style="max-width:100%; max-height:120px; border-radius:8px; border:1px solid #e5e7eb;" />` : ''}
+                    </div>
+                </div>
+                            <input type="text" class="test-avatar" placeholder="অবতার (যেমন: FA)" value="${escapedAvatar}" />
+                            <input type="text" class="test-name" placeholder="নাম" style="margin-top:8px;" value="${escapedName}" />
+                            <input type="text" class="test-title" placeholder="পদবি / অবস্থান" style="margin-top:8px;" value="${escapedTitle}" />
+                            <textarea class="test-quote" placeholder="উক্তি" style="margin-top:8px;">${escapedQuote}</textarea>
+                            <div style="margin-top:8px; display:flex; gap:8px; align-items:center;">
+                                <button type="button" class="btn btn-primary" onclick="saveTestimonial(${id})" style="padding:8px 16px; font-size:13px;">${isNew ? 'যোগ করুন' : 'আপডেট'}</button>
+                                <span class="save-status-${id}" style="font-size:12px; color:#666; margin-left:8px;"></span>
+                </div>
+                            ${!isNew ? '<div style="margin-top:8px;"><button type="button" class="delete-btn" onclick="deleteTestimonial('+id+')" style="width:100%;">মুছুন</button></div>' : ''}
+                        `;
+                        return card;
+                    }
+
+                    window.saveTestimonial = async function(id) {
+                        const card = document.querySelector(`[data-testimonial-id="${id}"]`);
+                        if (!card) return;
+
+                        const name = card.querySelector('.test-name').value.trim();
+                        const title = card.querySelector('.test-title').value.trim();
+                        const quote = card.querySelector('.test-quote').value.trim();
+                        const avatar = card.querySelector('.test-avatar').value.trim();
+                        const imageFile = card.querySelector('.test-image').files[0];
+                        const statusEl = card.querySelector(`.save-status-${id}`);
+
+                        if (!name || !title || !quote) {
+                            if(typeof alertUser==='function'){ alertUser('ত্রুটি','অনুগ্রহ করে সব ফিল্ড পূরণ করুন।'); }
+                            if(statusEl) statusEl.textContent = '';
+                            return;
+                        }
+
+                        // Show saving status
+                        if(statusEl) {
+                            statusEl.textContent = 'সংরক্ষণ করা হচ্ছে...';
+                            statusEl.style.color = '#666';
+                        }
+
+                        try {
+                            const isNew = id.toString().startsWith('new_');
+                            const url = isNew ? '/admin/testimonials' : `/admin/testimonials/${id}`;
+                            const method = isNew ? 'POST' : 'PUT';
+
+                            const formData = new FormData();
+                            formData.append('name', name);
+                            formData.append('title', title);
+                            formData.append('quote', quote);
+                            formData.append('avatar', avatar);
+                            if (imageFile) {
+                                formData.append('image', imageFile);
+                            }
+
+                            const response = await fetch(url, {
+                                method: method,
+                                headers: {
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+                                },
+                                body: formData
                             });
-                        }catch(e){}
+
+                            if (!response.ok) {
+                                const errorText = await response.text();
+                                console.error('Server error:', errorText);
+                                throw new Error('Network response was not ok: ' + response.status);
+                            }
+
+                            const result = await response.json();
+                            console.log('Save result:', result);
+                            
+                            if (result.success) {
+                                // ALWAYS show notification immediately - no checks, just show it
+                                console.log('Save successful, showing notification...');
+                                
+                                // Remove any existing notification first
+                                const existing = document.getElementById('testimonial-success-notification');
+                                if (existing) {
+                                    existing.remove();
+                                }
+                                
+                                // Create and show notification directly
+                                const notification = document.createElement('div');
+                                notification.id = 'testimonial-success-notification';
+                                notification.style.cssText = `
+                                    position: fixed !important;
+                                    top: 20px !important;
+                                    left: 50% !important;
+                                    transform: translateX(-50%) !important;
+                                    background: #10b981 !important;
+                                    color: white !important;
+                                    padding: 16px 24px !important;
+                                    border-radius: 8px !important;
+                                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+                                    z-index: 99999 !important;
+                                    display: flex !important;
+                                    align-items: center !important;
+                                    gap: 12px !important;
+                                    min-width: 300px !important;
+                                    max-width: 500px !important;
+                                    font-family: Arial, sans-serif !important;
+                                `;
+                                notification.innerHTML = `
+                                    <div style="font-size: 24px; flex-shrink: 0;">✓</div>
+                                    <div style="flex: 1;">
+                                        <div style="font-weight: 600; margin-bottom: 4px; font-size: 16px;">সফল!</div>
+                                        <div style="font-size: 14px; opacity: 0.95; line-height: 1.4;">আপনার মন্তব্য সফলভাবে যোগ করা হয়েছে এবং হোম পেজে দেখানো হবে।</div>
+            </div>
+                                `;
+                                
+                                // Add to body immediately
+                                document.body.appendChild(notification);
+                                
+                                // Force visibility
+                                notification.style.display = 'flex';
+                                notification.style.visibility = 'visible';
+                                notification.style.opacity = '1';
+                                
+                                // Auto remove after 5 seconds
+                                setTimeout(() => {
+                                    if (notification.parentNode) {
+                                        notification.style.transition = 'opacity 0.3s ease';
+                                        notification.style.opacity = '0';
+                                        setTimeout(() => {
+                                            if (notification.parentNode) {
+                                                notification.remove();
+                                            }
+                                        }, 300);
+                                    }
+                                }, 5000);
+                                
+                                // Update status beside button
+                                if(statusEl) {
+                                    statusEl.textContent = '✓ সংরক্ষিত';
+                                    statusEl.style.color = '#10b981';
+                                    setTimeout(() => {
+                                        statusEl.textContent = '';
+                                    }, 3000);
+                                }
+                                
+                                // Reload testimonials list in admin - this will replace the new card with saved one
+                                // The saved testimonial will appear as a card with delete button at bottom
+                                // Card will remain visible with all saved data
+                                setTimeout(() => {
+                                    loadTestimonials();
+                                }, 500);
+                            } else {
+                                console.error('Save failed:', result);
+                                if(statusEl) {
+                                    statusEl.textContent = '✗ ত্রুটি';
+                                    statusEl.style.color = '#ef4444';
+                                }
+                                if(typeof alertUser==='function'){ alertUser('ত্রুটি','কিছু ভুল হয়েছে।'); }
+                            }
+                        } catch (error) {
+                            console.error('Error:', error);
+                            if(statusEl) {
+                                statusEl.textContent = '✗ ত্রুটি';
+                                statusEl.style.color = '#ef4444';
+                            }
+                            if(typeof alertUser==='function'){ alertUser('ত্রুটি','নেটওয়ার্ক ত্রুটি। অনুগ্রহ করে আবার চেষ্টা করুন।'); }
+                        }
+                    };
+
+                    window.deleteTestimonial = async function(id) {
+                        if (!confirm('আপনি কি এই মন্তব্য মুছে ফেলতে চান?')) return;
+
+                        try {
+                            const response = await fetch(`/admin/testimonials/${id}`, {
+                                method: 'DELETE',
+                                headers: {
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+                                }
+                            });
+
+                            const result = await response.json();
+                            
+                            if (result.success) {
+                                if(typeof alertUser==='function'){ alertUser('সফল', result.message); }
+                                loadTestimonials();
+                            } else {
+                                if(typeof alertUser==='function'){ alertUser('ত্রুটি','কিছু ভুল হয়েছে।'); }
+                            }
+                        } catch (error) {
+                            console.error('Error:', error);
+                            if(typeof alertUser==='function'){ alertUser('ত্রুটি','নেটওয়ার্ক ত্রুটি।'); }
+                        }
+                    };
+
+                    async function loadTestimonials() {
+                        try {
+                            const response = await fetch('/api/testimonials');
+                            if (!response.ok) {
+                                throw new Error('Failed to load testimonials');
+                            }
+                            testimonials = await response.json();
+                            
+                            // Clear container and rebuild with all testimonials from database
+                            container.innerHTML = '';
+                            
+                            if (testimonials.length === 0) {
+                                // Show message if no testimonials
+                                container.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 2rem; color: #666;">কোন মন্তব্য নেই। "মন্তব্য যোগ করুন" বাটনে ক্লিক করে নতুন মন্তব্য যোগ করুন।</div>';
+                            } else {
+                                // Render all testimonials - they will appear as cards with delete buttons
+                                testimonials.forEach((testimonial, index) => {
+                                    const card = createTestimonialCard(testimonial, index);
+                                    container.appendChild(card);
+                                });
+                            }
+                        } catch (error) {
+                            console.error('Error loading testimonials:', error);
+                            if (container) {
+                                container.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 2rem; color: #ef4444;">মন্তব্য লোড করতে সমস্যা হয়েছে।</div>';
+                            }
+                        }
                     }
-                    function save(){
-                        const inputs = getInputs();
-                        const items = inputs.map(g=>({avatar:g.avatar.value, name:g.name.value, title:g.title.value, quote:g.quote.value}));
-                        const payload = { items };
-                        localStorage.setItem('testimonialsSettings', JSON.stringify(payload));
-                        window.dispatchEvent(new StorageEvent('storage', {key:'testimonialsSettings', newValue: JSON.stringify(payload)}));
-                    }
-                    const saveBtn = document.getElementById('saveTestimonialsBtn');
-                    const resetBtn = document.getElementById('resetTestimonialsBtn');
-                    saveBtn && saveBtn.addEventListener('click', ()=>{ save(); if(typeof alertUser==='function'){ alertUser('সফল','মন্তব্যসমূহ সংরক্ষণ করা হয়েছে।'); } });
-                    resetBtn && resetBtn.addEventListener('click', ()=>{
-                        localStorage.removeItem('testimonialsSettings');
-                        getInputs().forEach(g=>{ g.avatar.value=''; g.name.value=''; g.title.value=''; g.quote.value=''; });
-                        window.dispatchEvent(new StorageEvent('storage', {key:'testimonialsSettings', newValue: null}));
-                        if(typeof alertUser==='function'){ alertUser('সফল','মন্তব্যসমূহ রিসেট করা হয়েছে।'); }
+
+                    window.previewTestimonialImage = function(input, id) {
+                        const previewDiv = document.querySelector(`.image-preview-${id}`);
+                        if (input.files && input.files[0]) {
+                            const reader = new FileReader();
+                            reader.onload = function(e) {
+                                previewDiv.innerHTML = `<img src="${e.target.result}" alt="Preview" style="max-width:100%; max-height:120px; border-radius:8px; border:1px solid #e5e7eb;" />`;
+                            };
+                            reader.readAsDataURL(input.files[0]);
+                        }
+                    };
+
+
+                    document.getElementById('addTestimonialBtn').addEventListener('click', () => {
+                        const card = createTestimonialCard();
+                        container.appendChild(card);
+                        card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                     });
-                    // Auto-save on input
-                    getInputs().forEach(g=>{ ['input','change'].forEach(evt=>{
-                        g.avatar.addEventListener(evt, save);
-                        g.name.addEventListener(evt, save);
-                        g.title.addEventListener(evt, save);
-                        g.quote.addEventListener(evt, save);
-                    }); });
-                    load();
+
+                    loadTestimonials();
                 })();
             </script>
         </div>
