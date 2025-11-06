@@ -144,8 +144,8 @@
   </style>
   <!-- Hero Section -->
   <section class="hero-section">
-    <h1>আমাদের অন্যান্য প্রকল্প</h1>
-    <p>নেক্স রিয়েল এস্টেট এর অসাধারণ কিছু প্রকল্পের এক ঝলক।</p>
+    <h1 id="othersHeroTitle">আমাদের অন্যান্য প্রকল্প</h1>
+    <p id="othersHeroSubtitle">নেক্স রিয়েল এস্টেট এর অসাধারণ কিছু প্রকল্পের এক ঝলক।</p>
   </section>
 
   <!-- Intro Section -->
@@ -474,4 +474,35 @@
       }
     }
   </style>
+
+  <script>
+  (function(){
+      const defaults = {
+          title: 'আমাদের অন্যান্য প্রকল্প',
+          subtitle: 'নেক্স রিয়েল এস্টেট এর অসাধারণ কিছু প্রকল্পের এক ঝলক।'
+      };
+
+      const el = {
+          title: document.getElementById('othersHeroTitle'),
+          subtitle: document.getElementById('othersHeroSubtitle')
+      };
+
+      function read(){
+          try{ return JSON.parse(localStorage.getItem('projectsHeroSettings')||'{}'); }catch(e){ return {}; }
+      }
+
+      function apply(){
+          const saved = read();
+          const s = { ...defaults, ...saved };
+
+          if (el.title) el.title.textContent = s.title || defaults.title;
+          if (el.subtitle) el.subtitle.textContent = s.subtitle || s.description || defaults.subtitle;
+      }
+
+      apply();
+      window.addEventListener('storage', (e)=>{ if(e.key==='projectsHeroSettings'){ apply(); } });
+      let last = localStorage.getItem('projectsHeroSettings');
+      setInterval(()=>{ const cur = localStorage.getItem('projectsHeroSettings'); if(cur!==last){ last=cur; apply(); } }, 1000);
+  })();
+  </script>
 @endsection

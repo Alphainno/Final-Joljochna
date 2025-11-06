@@ -117,9 +117,9 @@
     <!-- LEFT SIDE - OFFER DETAILS -->
     <div class="col-lg-6 col-md-12 mb-4 mb-lg-0">
       <div class="offer-card h-100">
-        <h2 class="offer-title">বেছে নিন আপনার পছন্দের প্লট</h2>
+        <h2 class="offer-title" id="prokolpoTitle">বেছে নিন আপনার পছন্দের প্লট</h2>
 
-        <div class="row g-3 justify-content-center">
+        <div class="row g-3 justify-content-center" id="prokolpoPlots">
           <div class="col-6">
             <div class="plot-box">
               <div class="plot-size">৮ কাঠা</div>
@@ -149,14 +149,14 @@
           </div>
         </div>
 
-        <div class="mt-3 text-center">
+        <div class="mt-3 text-center" id="prokolpoAmenities">
           <span class="category-label bg-success text-white">ক্লাব হাউজ</span>
           <span class="category-label bg-success text-white">জিম</span>
           <span class="category-label bg-success text-white">মসজিদ</span>
           <span class="category-label bg-success text-white">শপিং এরিয়া</span>
         </div>
 
-        <div class="footer-note">
+        <div class="footer-note" id="prokolpoFooterNote">
           <p>
             সবুজ প্রকৃতি, নীরব কলকল ধারা আর নির্মল আবহাওয়া — এই জায়গাটি হতে পারে আপনার স্বপ্নের ঠিকানা!
             এখানে আছে আধুনিক রাস্তাঘাট, বিদ্যুৎ, পানি, গ্যাস, ও নিরাপত্তার নিশ্চয়তা।
@@ -164,7 +164,7 @@
           <p>মূল্য বৃদ্ধির আগে, আজই বুকিং করুন।</p>
         </div>
 
-        <div class="cta-bar">
+        <div class="cta-bar" id="prokolpoCtaBar">
           📞 এখনই যোগাযোগ করুন — সীমিত সময়ের অফার
         </div>
       </div>
@@ -174,8 +174,70 @@
     <div class="col-lg-6 col-md-12">
       <div class="map-section h-100">
         <h3 class="map-title">প্রকল্পের রোডম্যাপ</h3>
-        <img src="assets/images/realstate3.PNG" class="img-fluid object-fit-fill" alt="Project Map">
+        <img src="assets/images/realstate3.PNG" class="img-fluid object-fit-fill" alt="Project Map" id="prokolpoMapImage">
       </div>
     </div>
   </div>
 </div>
+
+<script>
+(function(){
+    const defaults = {
+        offerTitle: 'বেছে নিন আপনার পছন্দের প্লট',
+        plots: [
+            {size: '৮ কাঠা', cat: 'প্রিমিয়াম প্লট'},
+            {size: '১০ কাঠা', cat: 'ডিলাক্স প্লট'},
+            {size: '৩০ কাঠা', cat: 'এক্সিকিউটিভ প্লট'},
+            {size: '২০ কাঠা', cat: 'কর্পোরেট প্লট'}
+        ],
+        amenities: ['ক্লাব হাউজ', 'জিম', 'মসজিদ', 'শপিং এরিয়া'],
+        footerNote: '<p>সবুজ প্রকৃতি, নীরব কলকল ধারা আর নির্মল আবহাওয়া — এই জায়গাটি হতে পারে আপনার স্বপ্নের ঠিকানা! এখানে আছে আধুনিক রাস্তাঘাট, বিদ্যুৎ, পানি, গ্যাস, ও নিরাপত্তার নিশ্চয়তা।</p><p>মূল্য বৃদ্ধির আগে, আজই বুকিং করুন।</p>',
+        ctaBar: '📞 এখনই যোগাযোগ করুন — সীমিত সময়ের অফার',
+        mapImage: 'assets/images/realstate3.PNG'
+    };
+
+    const el = {
+        title: document.getElementById('prokolpoTitle'),
+        plots: document.getElementById('prokolpoPlots'),
+        amenities: document.getElementById('prokolpoAmenities'),
+        footerNote: document.getElementById('prokolpoFooterNote'),
+        ctaBar: document.getElementById('prokolpoCtaBar'),
+        mapImage: document.getElementById('prokolpoMapImage')
+    };
+
+    function read(){
+        try{ return JSON.parse(localStorage.getItem('ourProjectsSettings')||'{}'); }catch(e){ return {}; }
+    }
+
+    function apply(){
+        const saved = read();
+        const s = { ...defaults, ...saved };
+
+        if (el.title) el.title.textContent = s.offerTitle;
+
+        if (el.plots) {
+            el.plots.innerHTML = s.plots.map(p => `
+                <div class="col-6">
+                    <div class="plot-box">
+                        <div class="plot-size">${p.size}</div>
+                        <div class="category-label">${p.cat}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        if (el.amenities) {
+            el.amenities.innerHTML = s.amenities.map(a => `<span class="category-label bg-success text-white">${a}</span>`).join('');
+        }
+
+        if (el.footerNote) el.footerNote.innerHTML = s.footerNote;
+        if (el.ctaBar) el.ctaBar.textContent = s.ctaBar;
+        if (el.mapImage && s.mapImage) el.mapImage.src = s.mapImage;
+    }
+
+    apply();
+    window.addEventListener('storage', (e)=>{ if(e.key==='ourProjectsSettings'){ apply(); } });
+    let last = localStorage.getItem('ourProjectsSettings');
+    setInterval(()=>{ const cur = localStorage.getItem('ourProjectsSettings'); if(cur!==last){ last=cur; apply(); } }, 1000);
+})();
+</script>
