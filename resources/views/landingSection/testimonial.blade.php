@@ -10,9 +10,11 @@
                     <div class="testimonial-card" data-testimonial-index="0">
                         <!-- Investor Info (LEFT Column) -->
                         <div class="investor-meta">
-                            <span class="investor-avatar test-avatar">FA</span>
-                            <span class="investor-name test-name">জনাব. ফারহান আহমেদ</span>
-                            <span class="investor-title test-title">ব্যবসায়ী, ঢাকা</span>
+                            <div class="investor-avatar test-avatar">FA</div>
+                            <div>
+                                <div class="investor-name test-name">জনাব. ফারহান আহমেদ</div>
+                                <div class="investor-title test-title">ব্যবসায়ী, ঢাকা</div>
+                            </div>
                         </div>
                         <!-- Quote Content (RIGHT Column) -->
                         <div class="quote-content-wrapper">
@@ -24,9 +26,11 @@
 
                     <div class="testimonial-card" data-testimonial-index="1">
                         <div class="investor-meta">
-                            <span class="investor-avatar test-avatar">JF</span>
-                            <span class="investor-name test-name">মিসেস. জান্নাতুল ফেরদৌস</span>
-                            <span class="investor-title test-title">গৃহিণী, খুলনা</span>
+                            <div class="investor-avatar test-avatar">JF</div>
+                            <div>
+                                <div class="investor-name test-name">মিসেস. জান্নাতুল ফেরদৌস</div>
+                                <div class="investor-title test-title">গৃহিণী, খুলনা</div>
+                            </div>
                         </div>
                         <div class="quote-content-wrapper">
                             <span class="quote-icon">❝</span>
@@ -37,9 +41,11 @@
 
                     <div class="testimonial-card" data-testimonial-index="2">
                         <div class="investor-meta">
-                            <span class="investor-avatar test-avatar">SR</span>
-                            <span class="investor-name test-name">জনাব. শফিকুর রহমান</span>
-                            <span class="investor-title test-title">প্রকৌশলী, যুক্তরাজ্য</span>
+                            <div class="investor-avatar test-avatar">SR</div>
+                            <div>
+                                <div class="investor-name test-name">জনাব. শফিকুর রহমান</div>
+                                <div class="investor-title test-title">প্রকৌশলী, যুক্তরাজ্য</div>
+                            </div>
                         </div>
                         <div class="quote-content-wrapper">
                             <span class="quote-icon">❝</span>
@@ -51,9 +57,11 @@
                     <!-- Added one more for effect -->
                     <div class="testimonial-card" data-testimonial-index="3">
                         <div class="investor-meta">
-                            <span class="investor-avatar test-avatar">AK</span>
-                            <span class="investor-name test-name">মিসেস. আয়েশা খানম</span>
-                            <span class="investor-title test-title">শিক্ষিকা, চট্টগ্রাম</span>
+                            <div class="investor-avatar test-avatar">AK</div>
+                            <div>
+                                <div class="investor-name test-name">মিসেস. আয়েশা খানম</div>
+                                <div class="investor-title test-title">শিক্ষিকা, চট্টগ্রাম</div>
+                            </div>
                         </div>
                         <div class="quote-content-wrapper">
                             <span class="quote-icon">❝</span>
