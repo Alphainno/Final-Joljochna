@@ -23,6 +23,10 @@ Each section uses a unique localStorage key:
 | Pricing | `pricingSettings` | Pricing plans with amounts and installments |
 | Testimonials | `testimonialsSettings` | Customer testimonials with names and quotes |
 | Contact | `contactSettings` | Contact information and form title |
+| Our Projects | `ourProjectsSettings` | Project details, plots, amenities, map |
+| Other Projects | `otherProjectsSettings` | Carousel projects with images, titles, descriptions |
+| Slogan | `sloganSettings` | Simple slogan text |
+| Projects Hero | `projectsHeroSettings` | Hero section for projects page with title, subtitle, description, buttons, slides |
 
 ## Data Structure
 
@@ -171,6 +175,65 @@ Each section uses a unique localStorage key:
   "addressLabel": "ঠিকানা",
   "addressText": "শুভনূর ৩৮৮ বাড়ি...<br>খুলনা, বাংলাদেশ",
   "formTitle": "বুকিং তথ্য পাঠান"
+}
+```
+
+### 8. Our Projects Settings (`ourProjectsSettings`)
+```json
+{
+  "offerTitle": "বেছে নিন আপনার পছন্দের প্লট",
+  "plots": [
+    {
+      "size": "৮ কাঠা",
+      "cat": "প্রিমিয়াম প্লট"
+    }
+  ],
+  "amenities": ["ক্লাব হাউজ", "জিম", "মসজিদ", "শপিং এরিয়া"],
+  "footerNote": "<p>সবুজ প্রকৃতি...</p>",
+  "ctaBar": "📞 এখনই যোগাযোগ করুন",
+  "mapImage": "data:image/png;base64,... or URL"
+}
+```
+
+### 9. Other Projects Settings (`otherProjectsSettings`)
+```json
+{
+  "sectionTitle": "অন্যান্য প্রকল্প",
+  "sectionSubtitle": "NEX Real Estate-এর সফল প্রকল্পগুলো দেখুন",
+  "projects": [
+    {
+      "image": "🏙️",
+      "title": "শান্তি নিবাস",
+      "desc": "শহরের ঠিক মাঝে...",
+      "btnText": "বিস্তারিত জানুন",
+      "btnLink": "#contact"
+    }
+  ]
+}
+```
+
+### 10. Slogan Settings (`sloganSettings`)
+```json
+{
+  "text": "আপনার স্বপ্নের বাড়ি"
+}
+```
+
+### 11. Projects Hero Settings (`projectsHeroSettings`)
+```json
+{
+  "title": "মুল্য বুদ্ধির আগে",
+  "subtitle": "বাড়ি বুকিং করুন",
+  "description": "প্রকল্পের মূল্য তালিকা - বুকিং পরিমাণ: ১০,০০০ টাকা",
+  "primaryText": "মূল্য দেখুন",
+  "primaryLink": "#pricing",
+  "secondaryText": "যোগাযোগ করুন",
+  "secondaryLink": "#contact",
+  "slides": [
+    "/images/slider/slide-1.jpg",
+    "/images/slider/slide-2.jpg",
+    "/images/slider/slide-3.jpg"
+  ]
 }
 ```
 

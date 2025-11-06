@@ -85,6 +85,10 @@ class FooterSettingController extends Controller
 
         $fs->save();
 
+        if ($request->expectsJson()) {
+            return response()->json(['success' => true, 'message' => 'Footer settings saved']);
+        }
+
         return back()->with('status', 'Footer settings saved');
     }
 }
