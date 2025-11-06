@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\FooterSetting;
 
 class HomeController extends Controller
 {
     public function landingPage(){
-         return view('pages.landing');
+         $footerSettings = FooterSetting::first();
+         return view('pages.landing', compact('footerSettings'));
     }
 
      public function aboutPage(){

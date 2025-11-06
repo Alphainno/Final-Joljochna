@@ -82,7 +82,7 @@
                 <h3 class="text-center" id="ftQrTitle">অবস্থান দেখুন</h3>
                 <div class="qr-container">
                     <div>
-                        <img alt="QR Code" style="max-width:160px; height:auto; background:#fff; padding:6px; border-radius:8px;" src="/images/alphainno-qr-code.png" />
+                        <img id="ftQrImg" alt="QR Code" style="max-width:160px; height:auto; background:#fff; padding:6px; border-radius:8px; display:none;" />
                     </div>
 
                     <div id="qr-reader-results"></div>
@@ -106,40 +106,55 @@
             function applyFooterSettings(saved) {
                 if (!saved || typeof saved !== 'object') return;
 
-                setText('ftTitle', saved.footerTitle);
-                setText('ftDesc', saved.footerDescription);
+                setText('ftTitle', saved.title || saved.footerTitle);
+                setText('ftDesc', saved.description || saved.footerDescription);
                 setText('ftPhone1', saved.phone1);
                 setText('ftPhone2', saved.phone2);
                 setText('ftEmail', saved.email);
-                setText('ftProjectAddress', saved.projectAddress);
-                setText('ftContactAddress', saved.contactAddress);
+                setText('ftProjectAddress', saved.project_address || saved.projectAddress);
+                setText('ftContactAddress', saved.contact_address || saved.contactAddress);
 
                 // quick links
-                setText('ftQlHomeText', saved.qlHomeLabel); setHref('ftQlHome', saved.qlHomeHref);
-                setText('ftQlFeaturesText', saved.qlFeaturesLabel); setHref('ftQlFeatures', saved.qlFeaturesHref);
-                setText('ftQlPricingText', saved.qlPricingLabel); setHref('ftQlPricing', saved.qlPricingHref);
-                setText('ftQlContactText', saved.qlContactLabel); setHref('ftQlContact', saved.qlContactHref);
-                setText('ftQlGalleryText', saved.qlGalleryLabel); setHref('ftQlGallery', saved.qlGalleryHref);
+                if (saved.quick_links && Array.isArray(saved.quick_links)) {
+                    const ql = saved.quick_links;
+                    if (ql[0]) { setText('ftQlHomeText', ql[0].label); setHref('ftQlHome', ql[0].href); }
+                    if (ql[1]) { setText('ftQlFeaturesText', ql[1].label); setHref('ftQlFeatures', ql[1].href); }
+                    if (ql[2]) { setText('ftQlPricingText', ql[2].label); setHref('ftQlPricing', ql[2].href); }
+                    if (ql[3]) { setText('ftQlContactText', ql[3].label); setHref('ftQlContact', ql[3].href); }
+                    if (ql[4]) { setText('ftQlGalleryText', ql[4].label); setHref('ftQlGallery', ql[4].href); }
+                }
 
                 // legal
-                setText('ftPrivacyText', saved.legalPrivacyLabel); setHref('ftPrivacy', saved.legalPrivacyHref);
-                setText('ftTermsText', saved.legalTermsLabel); setHref('ftTerms', saved.legalTermsHref);
+                if (saved.legal_links && Array.isArray(saved.legal_links)) {
+                    const ll = saved.legal_links;
+                    if (ll[0]) { setText('ftPrivacyText', ll[0].label); setHref('ftPrivacy', ll[0].href); }
+                    if (ll[1]) { setText('ftTermsText', ll[1].label); setHref('ftTerms', ll[1].href); }
+                }
 
                 // social
-                setHref('ftFb', saved.socialFacebook);
-                setHref('ftIg', saved.socialInstagram);
-                setHref('ftTw', saved.socialTwitter);
-                setHref('ftLn', saved.socialLinkedin);
-                setHref('ftYt', saved.socialYouTube);
+                if (saved.social_links && typeof saved.social_links === 'object') {
+                    setHref('ftFb', saved.social_links.facebook || '#');
+                    setHref('ftIg', saved.social_links.instagram || '#');
+                    setHref('ftTw', saved.social_links.twitter || '#');
+                    setHref('ftLn', saved.social_links.linkedin || '#');
+                    setHref('ftYt', saved.social_links.youtube || '#');
+                }
 
                 // map and bottom
-                setHref('ftMap', saved.mapUrl);
-                setText('ftBottom', saved.bottomText);
+                setHref('ftMap', saved.map_url || saved.mapUrl);
+                setText('ftBottom', saved.bottom_text || saved.bottomText);
+
+                // QR section
+                setText('ftQrTitle', saved.qr_section_title || saved.qrSectionTitle || 'অবস্থান দেখুন');
+                setText('ftMapText', saved.map_button_text || saved.mapButtonText || 'গুগল ম্যাপে দেখুন');
 
                 // QR image
                 const qrImg = document.getElementById('ftQrImg');
                 if (qrImg) {
-                    if (typeof saved.qrDataUrl === 'string' && saved.qrDataUrl.length > 0) {
+                    if (saved.qr_image_path) {
+                        qrImg.src = '/storage/' + saved.qr_image_path;
+                        qrImg.style.display = 'inline-block';
+                    } else if (saved.qrDataUrl) {
                         qrImg.src = saved.qrDataUrl;
                         qrImg.style.display = 'inline-block';
                     } else {
@@ -149,104 +164,34 @@
                 }
             }
 
-            // Initial apply (no early return)
-            try {
-                const saved = JSON.parse(localStorage.getItem('footerSettings') || '{}');
-                applyFooterSettings(saved);
-            } catch(e) { /* ignore */ }
-        })();
+            // Load settings from API
+            function loadFooterSettings() {
+                fetch('/api/footer-settings')
+                    .then(response => response.json())
+                    .then(data => {
+                        applyFooterSettings(data);
+                    })
+                    .catch(error => {
+                        console.error('Error loading footer settings:', error);
+                        // Fallback to localStorage if API fails
+                        try {
+                            const saved = JSON.parse(localStorage.getItem('footerSettings') || '{}');
+                            applyFooterSettings(saved);
+                        } catch(e) { /* ignore */ }
+                    });
+            }
 
-        // Live update when dashboard saves settings (works across tabs)
-        window.addEventListener('storage', (e) => {
-            if (e.key !== 'footerSettings') return;
-            try {
-                const saved = JSON.parse(e.newValue || '{}');
-                (function apply(saved){
-                    const setText = (id, val) => { const el = document.getElementById(id); if (el && typeof val === 'string') el.textContent = val; };
-                    const setHref = (id, val) => { const el = document.getElementById(id); if (el && typeof val === 'string') el.setAttribute('href', val); };
-                    setText('ftTitle', saved.footerTitle);
-                    setText('ftDesc', saved.footerDescription);
-                    setText('ftPhone1', saved.phone1);
-                    setText('ftPhone2', saved.phone2);
-                    setText('ftEmail', saved.email);
-                    setText('ftProjectAddress', saved.projectAddress);
-                    setText('ftContactAddress', saved.contactAddress);
-                    setHref('ftMap', saved.mapUrl);
-                    setText('ftBottom', saved.bottomText);
-                    // Add missing quick links
-                    setText('ftQlHomeText', saved.qlHomeLabel); setHref('ftQlHome', saved.qlHomeHref);
-                    setText('ftQlFeaturesText', saved.qlFeaturesLabel); setHref('ftQlFeatures', saved.qlFeaturesHref);
-                    setText('ftQlPricingText', saved.qlPricingLabel); setHref('ftQlPricing', saved.qlPricingHref);
-                    setText('ftQlContactText', saved.qlContactLabel); setHref('ftQlContact', saved.qlContactHref);
-                    setText('ftQlGalleryText', saved.qlGalleryLabel); setHref('ftQlGallery', saved.qlGalleryHref);
-                    // legal
-                    setText('ftPrivacyText', saved.legalPrivacyLabel); setHref('ftPrivacy', saved.legalPrivacyHref);
-                    setText('ftTermsText', saved.legalTermsLabel); setHref('ftTerms', saved.legalTermsHref);
-                    // social
-                    setHref('ftFb', saved.socialFacebook);
-                    setHref('ftIg', saved.socialInstagram);
-                    setHref('ftTw', saved.socialTwitter);
-                    setHref('ftLn', saved.socialLinkedin);
-                    setHref('ftYt', saved.socialYouTube);
-                    // QR title and map text
-                    setText('ftQrTitle', saved.qrSectionTitle);
-                    setText('ftMapText', saved.mapButtonText);
-                    const qrImg = document.getElementById('ftQrImg');
-                    if (qrImg) {
-                        if (typeof saved.qrDataUrl === 'string' && saved.qrDataUrl.length > 0) { qrImg.src = saved.qrDataUrl; qrImg.style.display = 'inline-block'; }
-                        else { qrImg.src = ''; qrImg.style.display = 'none'; }
-                    }
-                })(saved);
-            } catch (err) { /* ignore */ }
-        });
+            // Initial load
+            loadFooterSettings();
 
-        // Fallback: poll every 1s in case storage event doesn't fire in this environment
-        (function(){
-            let lastSettings = '';
+            // Live update when dashboard saves settings
+            window.addEventListener('footerSettingsUpdated', () => {
+                loadFooterSettings();
+            });
+
+            // Fallback: poll every 5s to reload from API
             setInterval(() => {
-                try {
-                    const saved = JSON.parse(localStorage.getItem('footerSettings') || '{}');
-                    const currentSettings = JSON.stringify(saved);
-                    if (currentSettings !== lastSettings) {
-                        lastSettings = currentSettings;
-                        (function apply(saved){
-                            const setText = (id, val) => { const el = document.getElementById(id); if (el && typeof val === 'string') el.textContent = val; };
-                            const setHref = (id, val) => { const el = document.getElementById(id); if (el && typeof val === 'string') el.setAttribute('href', val); };
-                            setText('ftTitle', saved.footerTitle);
-                            setText('ftDesc', saved.footerDescription);
-                            setText('ftPhone1', saved.phone1);
-                            setText('ftPhone2', saved.phone2);
-                            setText('ftEmail', saved.email);
-                            setText('ftProjectAddress', saved.projectAddress);
-                            setText('ftContactAddress', saved.contactAddress);
-                            setHref('ftMap', saved.mapUrl);
-                            setText('ftBottom', saved.bottomText);
-                            // Add missing quick links
-                            setText('ftQlHomeText', saved.qlHomeLabel); setHref('ftQlHome', saved.qlHomeHref);
-                            setText('ftQlFeaturesText', saved.qlFeaturesLabel); setHref('ftQlFeatures', saved.qlFeaturesHref);
-                            setText('ftQlPricingText', saved.qlPricingLabel); setHref('ftQlPricing', saved.qlPricingHref);
-                            setText('ftQlContactText', saved.qlContactLabel); setHref('ftQlContact', saved.qlContactHref);
-                            setText('ftQlGalleryText', saved.qlGalleryLabel); setHref('ftQlGallery', saved.qlGalleryHref);
-                            // legal
-                            setText('ftPrivacyText', saved.legalPrivacyLabel); setHref('ftPrivacy', saved.legalPrivacyHref);
-                            setText('ftTermsText', saved.legalTermsLabel); setHref('ftTerms', saved.legalTermsHref);
-                            // social
-                            setHref('ftFb', saved.socialFacebook);
-                            setHref('ftIg', saved.socialInstagram);
-                            setHref('ftTw', saved.socialTwitter);
-                            setHref('ftLn', saved.socialLinkedin);
-                            setHref('ftYt', saved.socialYouTube);
-                            // QR title and map text
-                            setText('ftQrTitle', saved.qrSectionTitle);
-                            setText('ftMapText', saved.mapButtonText);
-                            const qrImg = document.getElementById('ftQrImg');
-                            if (qrImg) {
-                                if (typeof saved.qrDataUrl === 'string' && saved.qrDataUrl.length > 0) { qrImg.src = saved.qrDataUrl; qrImg.style.display = 'inline-block'; }
-                                else { qrImg.src = ''; qrImg.style.display = 'none'; }
-                            }
-                        })(saved);
-                    }
-                } catch (e) { /* ignore */ }
-            }, 1000);
+                loadFooterSettings();
+            }, 5000);
         })();
     </script>

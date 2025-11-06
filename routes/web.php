@@ -16,6 +16,20 @@ Route::get('/projects',[HomeController::class, 'othersProjects'])->name('project
 // Admin: Footer settings
 Route::post('/admin/footer-settings', [FooterSettingController::class, 'store'])->name('admin.footer-settings.store');
 
+// API: Get footer settings
+Route::get('/api/footer-settings', function() {
+    $settings = \App\Models\FooterSetting::first();
+    if (!$settings) {
+        return response()->json(['error' => 'No footer settings found'], 404);
+    }
+    return response()->json($settings);
+})->name('api.footer-settings');
+
+
+
+
+
+
 
 
 

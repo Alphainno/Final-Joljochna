@@ -37,7 +37,7 @@ class FooterSettingSeeder extends Seeder
             ],
             'map_url' => 'https://maps.google.com/?q=শুভনূর+৩৮৮+বাড়ি+সিদ্ধার্থ+এস+আবাস,+খুলনা',
             'bottom_text' => '© ২০২৫ জলজোছনা। সর্বস্বত্ব সংরক্ষিত। | NEX Real Estate এর একটি প্রকল্প',
-            'qr_image_path' => 'images/alphainno-qr-code.png',
+            'qr_image_path' => 'footer/alphainno-qr-code.png',
             'qr_section_title' => 'অবস্থান দেখুন',
             'map_button_text' => 'গুগল ম্যাপে দেখুন',
         ]);

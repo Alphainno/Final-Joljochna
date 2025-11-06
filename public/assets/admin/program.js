@@ -634,45 +634,88 @@
         function loadFooterSettings() {
             const form = document.getElementById('footerSettingsForm');
             if (!form) return;
-            let saved = {};
-            try { saved = JSON.parse(localStorage.getItem('footerSettings') || '{}'); } catch (e) { saved = {}; }
-            const v = { ...footerDefaults, ...saved };
-            const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val; };
-            Object.keys(footerDefaults).forEach(k => setVal(k, v[k] ?? ''));
 
-            // checkbox
-            const qrShow = document.getElementById('qrShow');
-            if (qrShow) qrShow.checked = !!v.qrShow;
+            // Load from API
+            fetch('/api/footer-settings')
+                .then(response => response.json())
+                .then(data => {
+                    // Map API data to form fields
+                    const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val; };
 
-            footerQrDataUrl = v.qrDataUrl || '';
-            const pvQr = document.getElementById('pvQrImg');
-            const pvQrPlaceholder = document.getElementById('pvQrPlaceholder');
-            if (pvQr) {
-                if (footerQrDataUrl) {
-                    pvQr.src = footerQrDataUrl;
-                    pvQr.style.display = 'inline-block';
-                    if (pvQrPlaceholder) pvQrPlaceholder.style.display = 'none';
-                } else {
-                    pvQr.src = '';
-                    pvQr.style.display = 'none';
-                    if (pvQrPlaceholder) pvQrPlaceholder.style.display = 'block';
-                }
-            }
+                    setVal('footerTitle', data.title || '');
+                    setVal('footerDescription', data.description || '');
+                    setVal('phone1', data.phone1 || '');
+                    setVal('phone2', data.phone2 || '');
+                    setVal('email', data.email || '');
+                    setVal('projectAddress', data.project_address || '');
+                    setVal('contactAddress', data.contact_address || '');
+                    setVal('mapUrl', data.map_url || '');
+                    setVal('bottomText', data.bottom_text || '');
+                    setVal('qrSectionTitle', data.qr_section_title || '');
+                    setVal('mapButtonText', data.map_button_text || '');
 
-            // bind listeners for live preview
-            Array.from(form.querySelectorAll('input, textarea')).forEach(el => {
-                if (!el.dataset.bound) {
-                    el.addEventListener('input', updateFooterPreview);
-                    el.dataset.bound = 'true';
-                }
-            });
+                    // Quick links
+                    if (data.quick_links && Array.isArray(data.quick_links)) {
+                        const ql = data.quick_links;
+                        if (ql[0]) { setVal('qlHomeLabel', ql[0].label); setVal('qlHomeHref', ql[0].href); }
+                        if (ql[1]) { setVal('qlFeaturesLabel', ql[1].label); setVal('qlFeaturesHref', ql[1].href); }
+                        if (ql[2]) { setVal('qlPricingLabel', ql[2].label); setVal('qlPricingHref', ql[2].href); }
+                        if (ql[3]) { setVal('qlContactLabel', ql[3].label); setVal('qlContactHref', ql[3].href); }
+                        if (ql[4]) { setVal('qlGalleryLabel', ql[4].label); setVal('qlGalleryHref', ql[4].href); }
+                    }
 
-            // checkbox listener
-            if (qrShow && !qrShow.dataset.bound) {
-                qrShow.addEventListener('change', updateFooterPreview);
-                qrShow.dataset.bound = 'true';
-            }
+                    // Legal links
+                    if (data.legal_links && Array.isArray(data.legal_links)) {
+                        const ll = data.legal_links;
+                        if (ll[0]) { setVal('legalPrivacyLabel', ll[0].label); setVal('legalPrivacyHref', ll[0].href); }
+                        if (ll[1]) { setVal('legalTermsLabel', ll[1].label); setVal('legalTermsHref', ll[1].href); }
+                    }
 
+                    // Social links
+                    if (data.social_links && typeof data.social_links === 'object') {
+                        setVal('socialFacebook', data.social_links.facebook || '');
+                        setVal('socialInstagram', data.social_links.instagram || '');
+                        setVal('socialTwitter', data.social_links.twitter || '');
+                        setVal('socialLinkedin', data.social_links.linkedin || '');
+                        setVal('socialYouTube', data.social_links.youtube || '');
+                    }
+
+                    // QR image
+                    footerQrDataUrl = data.qr_image_path ? '/storage/' + data.qr_image_path : '';
+                    const pvQr = document.getElementById('pvQrImg');
+                    const pvQrPlaceholder = document.getElementById('pvQrPlaceholder');
+                    if (pvQr) {
+                        if (footerQrDataUrl) {
+                            pvQr.src = footerQrDataUrl;
+                            pvQr.style.display = 'inline-block';
+                            if (pvQrPlaceholder) pvQrPlaceholder.style.display = 'none';
+                        } else {
+                            pvQr.src = '';
+                            pvQr.style.display = 'none';
+                            if (pvQrPlaceholder) pvQrPlaceholder.style.display = 'block';
+                        }
+                    }
+
+                    // Bind listeners for live preview
+                    Array.from(form.querySelectorAll('input, textarea')).forEach(el => {
+                        if (!el.dataset.bound) {
+                            el.addEventListener('input', updateFooterPreview);
+                            el.dataset.bound = 'true';
+                        }
+                    });
+
+                    // Update preview
+                    updateFooterPreview();
+                })
+                .catch(error => {
+                    console.error('Error loading footer settings:', error);
+                    // Fallback to defaults
+                    const v = footerDefaults;
+                    const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val; };
+                    Object.keys(footerDefaults).forEach(k => setVal(k, v[k] ?? ''));
+                });
+
+            // Bind file input listener for QR upload preview
             const qrInput = document.getElementById('footerQrFile');
             if (qrInput && !qrInput.dataset.bound) {
                 qrInput.addEventListener('change', (e) => {
@@ -693,48 +736,98 @@
                         if (pv) { pv.src = footerQrDataUrl; pv.style.display = 'inline-block'; }
                         const placeholder = document.getElementById('pvQrPlaceholder');
                         if (placeholder) placeholder.style.display = 'none';
-                        if (objectUrl) { try { URL.revokeObjectURL(objectUrl); } catch(_) {}
-                        }
-
-                        // Auto-save to localStorage to trigger public footer live update
-                        try {
-                            let saved = {};
-                            try { saved = JSON.parse(localStorage.getItem('footerSettings') || '{}'); } catch (_) { saved = {}; }
-                            const data = { ...footerDefaults, ...saved };
-                            // capture current form values too
-                            Object.keys(footerDefaults).forEach(k => {
-                                const el = document.getElementById(k);
-                                if (el) data[k] = el.value;
-                            });
-                            data.qrDataUrl = footerQrDataUrl;
-                            localStorage.setItem('footerSettings', JSON.stringify(data));
-                        } catch (_) { /* ignore */ }
+                        if (objectUrl) { try { URL.revokeObjectURL(objectUrl); } catch(_) {} }
                     };
                     reader.readAsDataURL(file);
                 });
                 qrInput.dataset.bound = 'true';
             }
-
-            updateFooterPreview();
         }
 
         function saveFooterSettings() {
             const form = document.getElementById('footerSettingsForm');
             if (!form) return;
-            const data = {};
-            Object.keys(footerDefaults).forEach(k => {
-                const el = document.getElementById(k);
-                data[k] = el ? el.value : footerDefaults[k];
+
+            const formData = new FormData();
+
+            // Map form field IDs to API field names
+            const fieldMapping = {
+                'footerTitle': 'title',
+                'footerDescription': 'description',
+                'phone1': 'phone1',
+                'phone2': 'phone2',
+                'email': 'email',
+                'projectAddress': 'project_address',
+                'contactAddress': 'contact_address',
+                'mapUrl': 'map_url',
+                'bottomText': 'bottom_text',
+                'qrSectionTitle': 'qr_section_title',
+                'mapButtonText': 'map_button_text',
+                'qlHomeLabel': 'qlHomeLabel',
+                'qlHomeHref': 'qlHomeHref',
+                'qlFeaturesLabel': 'qlFeaturesLabel',
+                'qlFeaturesHref': 'qlFeaturesHref',
+                'qlPricingLabel': 'qlPricingLabel',
+                'qlPricingHref': 'qlPricingHref',
+                'qlContactLabel': 'qlContactLabel',
+                'qlContactHref': 'qlContactHref',
+                'qlGalleryLabel': 'qlGalleryLabel',
+                'qlGalleryHref': 'qlGalleryHref',
+                'legalPrivacyLabel': 'legalPrivacyLabel',
+                'legalPrivacyHref': 'legalPrivacyHref',
+                'legalTermsLabel': 'legalTermsLabel',
+                'legalTermsHref': 'legalTermsHref',
+                'socialFacebook': 'socialFacebook',
+                'socialInstagram': 'socialInstagram',
+                'socialTwitter': 'socialTwitter',
+                'socialLinkedin': 'socialLinkedin',
+                'socialYouTube': 'socialYouTube'
+            };
+
+            // Add all form fields with correct names
+            Object.keys(fieldMapping).forEach(formId => {
+                const el = document.getElementById(formId);
+                if (el) {
+                    formData.append(fieldMapping[formId], el.value);
+                }
             });
-            const qrShowEl = document.getElementById('qrShow');
-            data.qrShow = qrShowEl ? !!qrShowEl.checked : footerDefaults.qrShow;
-            data.qrDataUrl = footerQrDataUrl || '';
-            localStorage.setItem('footerSettings', JSON.stringify(data));
-            alertUser('সফল', 'ফুটার সেটিংস সংরক্ষণ করা হয়েছে।');
+
+            // Add QR file if selected
+            const qrFileEl = document.getElementById('footerQrFile');
+            if (qrFileEl && qrFileEl.files.length > 0) {
+                formData.append('qr_image', qrFileEl.files[0]);
+            }
+
+            // Send to backend
+            fetch('/admin/footer-settings', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success || response.ok) {
+                    alertUser('সফল', 'ফুটার সেটিংস সংরক্ষণ করা হয়েছে।');
+                    // Reload settings in admin
+                    loadFooterSettings();
+                    // Trigger live update for footer
+                    window.dispatchEvent(new CustomEvent('footerSettingsUpdated'));
+                } else {
+                    alertUser('ত্রুটি', 'সেটিংস সংরক্ষণ করতে ব্যর্থ হয়েছে।');
+                }
+            })
+            .catch(error => {
+                console.error('Error saving footer settings:', error);
+                alertUser('ত্রুটি', 'সেটিংস সংরক্ষণ করতে ব্যর্থ হয়েছে।');
+            });
         }
 
         function resetFooterSettings() {
+            // Clear localStorage
             localStorage.removeItem('footerSettings');
+            // Reload settings from backend (which should have defaults if no record exists)
             loadFooterSettings();
             alertUser('রিসেট', 'ডিফল্ট ফুটার সেটিংস পুনরুদ্ধার করা হয়েছে।');
         }
