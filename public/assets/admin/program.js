@@ -90,6 +90,8 @@
             const submenu = document.getElementById('homeSubmenu');
             if (submenu) {
                 submenu.classList.toggle('open');
+                const trigger = document.querySelector('.nav-item[data-tab="home"]');
+                if (trigger) trigger.setAttribute('aria-expanded', submenu.classList.contains('open') ? 'true' : 'false');
             }
         }
 
@@ -99,6 +101,8 @@
             showTab('about');
             if (submenu) {
                 submenu.classList.toggle('open');
+                const trigger = document.querySelector('.nav-item[data-tab="about"]');
+                if (trigger) trigger.setAttribute('aria-expanded', submenu.classList.contains('open') ? 'true' : 'false');
             }
         }
 
@@ -108,6 +112,8 @@
             showTab('projects');
             if (submenu) {
                 submenu.classList.toggle('open');
+                const trigger = document.querySelector('.nav-item[data-tab="projects"]');
+                if (trigger) trigger.setAttribute('aria-expanded', submenu.classList.contains('open') ? 'true' : 'false');
             }
         }
 
@@ -117,6 +123,8 @@
             showTab('bookings');
             if (submenu) {
                 submenu.classList.toggle('open');
+                const trigger = document.querySelector('.nav-item[data-tab="bookings"]');
+                if (trigger) trigger.setAttribute('aria-expanded', submenu.classList.contains('open') ? 'true' : 'false');
             }
         }
 
@@ -494,6 +502,17 @@
                 preview.style.display = (preview.src ? 'block' : 'none');
             }
 
+            // Initialize sidebar logo from header settings (with default fallback)
+            const sidebarLogo = document.getElementById('adminSidebarLogo');
+            const sidebarTitle = document.getElementById('adminSidebarTitle');
+            const defaultLogoPath = '/images/joljochna-default-logo.svg';
+            const sidebarSrc = headerLogoDataUrl || values.logoUrl || defaultLogoPath;
+            if (sidebarLogo && sidebarTitle) {
+                sidebarLogo.src = sidebarSrc;
+                sidebarLogo.style.display = 'block';
+                sidebarTitle.style.display = 'none';
+            }
+
             // Attach file change handler once
             const fileInput = document.getElementById('headerLogoFile');
             if (fileInput && !fileInput.dataset.bound) {
@@ -558,6 +577,10 @@
             headerLogoDataUrl = '';
             const preview = document.getElementById('headerLogoPreview');
             if (preview) { preview.src = ''; preview.style.display = 'none'; }
+            const sidebarLogo = document.getElementById('adminSidebarLogo');
+            const sidebarTitle = document.getElementById('adminSidebarTitle');
+            if (sidebarLogo) { sidebarLogo.src = '/images/joljochna-default-logo.svg'; sidebarLogo.style.display = 'block'; }
+            if (sidebarTitle) { sidebarTitle.style.display = 'none'; }
             alertUser('রিসেট', 'ডিফল্ট হেডার সেটিংস পুনরুদ্ধার করা হয়েছে।');
         }
 
@@ -601,6 +624,21 @@
             const ctaText = document.getElementById('previewCtaText');
             if (cta) cta.setAttribute('href', getVal('ctaHref', '#contact'));
             if (ctaText) ctaText.textContent = getVal('ctaText', ctaText.textContent || '');
+
+            // Live-update sidebar logo as admin edits header settings (fallback to default)
+            const sidebarLogo = document.getElementById('adminSidebarLogo');
+            const sidebarTitle = document.getElementById('adminSidebarTitle');
+            const srcFromFields = (function(){
+                const filePreview = headerLogoDataUrl;
+                const urlField = document.getElementById('logoUrl');
+                const urlVal = urlField ? urlField.value : '';
+                return filePreview || urlVal || '/images/joljochna-default-logo.svg';
+            })();
+            if (sidebarLogo && sidebarTitle) {
+                sidebarLogo.src = srcFromFields;
+                sidebarLogo.style.display = 'block';
+                sidebarTitle.style.display = 'none';
+            }
         }
 
         // Footer settings
@@ -1003,4 +1041,25 @@
             showTab('overview');
             // Populate header settings form if present
             loadHeaderSettings();
+
+            // Keyboard accessibility for sidebar items with submenus
+            document.querySelectorAll('.nav-item[role="button"]').forEach(item => {
+                item.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        const tab = item.getAttribute('data-tab');
+                        if (tab === 'home') toggleHomeMenu();
+                        if (tab === 'about') toggleAboutMenu();
+                        if (tab === 'projects') toggleProjectsMenu();
+                        if (tab === 'bookings') toggleBookingsMenu();
+                    } else if (e.key === 'Escape') {
+                        const controls = item.getAttribute('aria-controls');
+                        const submenu = controls && document.getElementById(controls);
+                        if (submenu && submenu.classList.contains('open')) {
+                            submenu.classList.remove('open');
+                            item.setAttribute('aria-expanded', 'false');
+                        }
+                    }
+                });
+            });
         };

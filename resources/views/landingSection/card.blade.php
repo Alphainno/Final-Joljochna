@@ -1,4 +1,5 @@
 <section class="carousel-section">
+        <h2 class="section-title" style="text-align: center; margin: 2rem 0; color: #ffffff;">সোশ্যাল মিডিয়া</h2>
         <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3000">
             <!-- Carousel Indicators -->
             {{-- <div class="carousel-indicators">

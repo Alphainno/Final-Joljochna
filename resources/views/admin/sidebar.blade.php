@@ -1,6 +1,6 @@
  <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
-                <h1>জলজোছনা</h1>
+                <h1 id="adminSidebarTitle">জলজোছনা</h1>
                 <button class="toggle-btn" onclick="toggleSidebar()">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="3" y1="12" x2="21" y2="12"></line>
@@ -10,22 +10,25 @@
                 </button>
             </div>
 
-            <nav class="nav-menu">
+            <nav class="nav-menu" role="navigation" aria-label="Admin navigation">
                 <div class="nav-item active" data-tab="overview" onclick="showTab('overview')">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                        <rect x="3" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="3" width="7" height="7"></rect>
+                        <rect x="3" y="14" width="7" height="7"></rect>
+                        <rect x="14" y="14" width="7" height="7"></rect>
                     </svg>
                     <span>ওভারভিউ</span>
                 </div>
-                <div class="nav-item" data-tab="home" onclick="toggleHomeMenu()">
+                <div class="nav-item" data-tab="home" onclick="toggleHomeMenu()" role="button" tabindex="0" aria-expanded="false" aria-controls="homeSubmenu">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                     </svg>
                     <span>হোম</span>
                 </div>
                 
-                <div class="nav-submenu" id="homeSubmenu">
-                    <div class="nav-subitem" onclick="navigateTo('home','home-hero')">হির সেকশন</div>
+                <div class="nav-submenu" id="homeSubmenu" role="group" aria-label="Home submenu">
+                    <div class="nav-subitem" onclick="navigateTo('home','home-hero')">হিরো সেকশন</div>
                     <div class="nav-subitem" onclick="navigateTo('home','home-features')">আমাদের সুবিধা সমূহ</div>
                     <div class="nav-subitem" onclick="navigateTo('home','home-pricing')">মূল্য তালিকা</div>
                     <div class="nav-subitem" onclick="navigateTo('home','home-testimonials')">বিনিয়োগকারী মন্তব্য</div>
@@ -35,33 +38,34 @@
                     <div class="nav-subitem" onclick="navigateTo('home','home-contact')">যোগাযোগ করুন</div>
                 </div>
 
-                <div class="nav-item" data-tab="about" onclick="toggleAboutMenu()">
+                <div class="nav-item" data-tab="about" onclick="toggleAboutMenu()" role="button" tabindex="0" aria-expanded="false" aria-controls="aboutSubmenu">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                        <path d="M4 21c0-4 4-7 8-7s8 3 8 7"></path>
                     </svg>
                     <span>আমাদের সম্পর্কে</span>
                 </div>
-                <div class="nav-submenu" id="aboutSubmenu">
+                <div class="nav-submenu" id="aboutSubmenu" role="group" aria-label="About submenu">
                     <div class="nav-subitem" onclick="navigateTo('about','about-hero')">হিরো সেকশন</div>
                     <div class="nav-subitem" onclick="navigateTo('about','about-history')">আমাদের ইতিহাস</div>
                     <div class="nav-subitem" onclick="navigateTo('about','about-founder')">আমাদের প্রতিষ্ঠাতা</div>
                     <div class="nav-subitem" onclick="navigateTo('about','about-chairman')">আমাদের চেয়ারম্যান</div>
                 </div>
 
-                <div class="nav-item" data-tab="projects" onclick="toggleProjectsMenu()">
+                <div class="nav-item" data-tab="projects" onclick="toggleProjectsMenu()" role="button" tabindex="0" aria-expanded="false" aria-controls="projectsSubmenu">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M3 3h18v6H3zM3 15h18v6H3z"></path>
                     </svg>
                     <span>প্রকল্প</span>
                 </div>
-                <div class="nav-submenu" id="projectsSubmenu">
+                <div class="nav-submenu" id="projectsSubmenu" role="group" aria-label="Projects submenu">
                     <div class="nav-subitem" onclick="navigateTo('projects','projects-hero')">হিরো সেকশন</div>
                     <div class="nav-subitem" onclick="navigateTo('projects','projects-slogan')">স্লোগান</div>
                     <div class="nav-subitem" onclick="navigateTo('projects','projects-our')">আমাদের প্রজেক্টসমূহ</div>
                     <div class="nav-subitem" onclick="navigateTo('projects','projects-other')">অন্যান্য প্রজেক্টসমূহ</div>
                 </div>
 
-                <div class="nav-item" data-tab="bookings" onclick="toggleBookingsMenu()">
+                <div class="nav-item" data-tab="bookings" onclick="toggleBookingsMenu()" role="button" tabindex="0" aria-expanded="false" aria-controls="bookingsSubmenu">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                         <polyline points="14 2 14 8 20 8"></polyline>
@@ -83,16 +87,18 @@
 
                 <div class="nav-item" data-tab="reports" onclick="showTab('reports')">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
-                        <polyline points="17 6 23 6 23 12"></polyline>
+                        <line x1="6" y1="20" x2="6" y2="10"></line>
+                        <line x1="12" y1="20" x2="12" y2="6"></line>
+                        <line x1="18" y1="20" x2="18" y2="14"></line>
+                        <line x1="3" y1="20" x2="21" y2="20"></line>
                     </svg>
                     <span>রিপোর্ট</span>
                 </div>
 
                 <div class="nav-item" data-tab="settings" onclick="showTab('settings')">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 1l2.2 3.8 4.3.8-3 3 0.7 4.4L12 11.8 7.8 13l0.7-4.4-3-3 4.3-.8L12 1z"></path>
                         <circle cx="12" cy="12" r="3"></circle>
-                        <path d="M12 1v6m0 6v6m0-6h6m-6 0H6m3.2-3.2l4.2 4.2m-4.2 0l4.2-4.2M18.8 14.8l-4.2-4.2m4.2 0l-4.2 4.2"></path>
                     </svg>
                     <span>সেটিংস</span>
                 </div>

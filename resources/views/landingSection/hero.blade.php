@@ -36,8 +36,8 @@
             </div>
             <div class="overlay">
                 <div class="overlay-content">
-                    <h1 id="heroTitle">মুল্য বুদ্ধির আগে</h1>
-                    <h2 id="heroSubtitle">বাড়ি বুকিং করুন</h2>
+                    <h1 id="heroTitle">আপনার স্বপ্নের বাড়ি</h1>
+                    <h2 id="heroSubtitle">জলজোছনা প্রজেক্টে</h2>
                     <p id="heroDesc" class="hero-subtitle">প্রকল্পের মূল্য তালিকা - বুকিং পরিমাণ: ১০,০০০ টাকা (কার্য প্রতি)</p>
                     <div class="cta-buttons">
                         <a id="heroBtnPrimary" href="#pricing" class="btn btn-primary">মূল্য দেখুন</a>
@@ -86,7 +86,7 @@
                 const defaults = {
                     title: 'আপনার স্বপ্নের বাড়ি',
                     subtitle: 'জলজোছনা প্রজেক্টে',
-                    description: '',
+                    description: 'প্রকল্পের মূল্য তালিকা - বুকিং পরিমাণ: ১০,০০০ টাকা (কার্য প্রতি)',
                     primaryText: 'মূল্য দেখুন',
                     primaryLink: '#pricing',
                     secondaryText: 'যোগাযোগ করুন',

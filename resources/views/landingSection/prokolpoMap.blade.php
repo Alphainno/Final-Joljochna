@@ -112,6 +112,8 @@
   }
 </style>
 
+<h2 class="section-title" style="text-align: center; margin: 2rem 0; color: #ffffff;">প্রজেক্ট রোডম্যাপ</h2>
+
 <div class="container main-section py-4 mb-4">
   <div class="row align-items-stretch">
     <!-- LEFT SIDE - OFFER DETAILS -->

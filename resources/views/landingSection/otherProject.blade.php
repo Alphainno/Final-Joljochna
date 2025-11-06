@@ -15,7 +15,7 @@
             <a href="/projects" class="btn btn-primary">আরও দেখুন</a>
         </div>
         <script>
-            (function(){
+            (function(){sty
                 function get(){ try{ return JSON.parse(localStorage.getItem('otherProjectsSettings')||'{}'); }catch(e){ return {}; } }
                 const track = document.getElementById('projectTrack');
                 function render(){
