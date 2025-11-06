@@ -622,7 +622,7 @@
             socialFacebook: '#', socialInstagram: '#', socialTwitter: '#', socialLinkedin: '#', socialYouTube: '#',
             mapUrl: '#',
             bottomText: '© ২০২৫ জলজোছনা। সর্বস্বত্ব সংরক্ষিত। | NEX Real Estate এর একটি প্রকল্প',
-            qrDataUrl: '',
+            qrDataUrl: '/images/alphainno-qr-code.png',
             qrSectionTitle: 'অবস্থান দেখুন',
             mapButtonText: 'গুগল ম্যাপে দেখুন',
             qrShow: true
