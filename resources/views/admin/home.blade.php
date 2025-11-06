@@ -550,6 +550,119 @@
         </div>
     </div>
 
+    <div id="home-social" style="margin-top:1rem;">
+        <div class="table-card">
+            <h2>সোশ্যাল মিডিয়া</h2>
+            <style>
+                #home-social .social-form input[type="url"] { height: 46px; padding:10px 12px; font-size:15px; border-radius:10px; }
+                #home-social .grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+                @media (max-width: 960px){ #home-social .grid{ grid-template-columns:1fr } }
+            </style>
+            <div class="social-form">
+                <div class="grid">
+                    <input type="url" id="socialFacebook" placeholder="Facebook URL" />
+                    <input type="url" id="socialInstagram" placeholder="Instagram URL" />
+                    <input type="url" id="socialTwitter" placeholder="Twitter/X URL" />
+                    <input type="url" id="socialLinkedin" placeholder="LinkedIn URL" />
+                    <input type="url" id="socialYouTube" placeholder="YouTube URL" />
+                </div>
+                <div style="margin-top:14px; display:flex; gap:10px;">
+                    <button id="saveSocialBtn" class="btn btn-primary" type="button">সেভ</button>
+                    <button id="resetSocialBtn" class="btn btn-secondary" type="button">রিসেট</button>
+                </div>
+            </div>
+            <script>
+                (function(){
+                    const ids=['Facebook','Instagram','Twitter','Linkedin','YouTube'];
+                    function load(){
+                        try{
+                            const v = JSON.parse(localStorage.getItem('socialSettings')||'{}');
+                            ids.forEach(k=>{ const el=document.getElementById('social'+k); if(el) el.value = v['social'+k] || ''; });
+                        }catch(_){}
+                    }
+                    function collect(){
+                        const v={}; ids.forEach(k=>{ const el=document.getElementById('social'+k); v['social'+k]= el ? el.value.trim() : ''; }); return v;
+                    }
+                    function save(v){ localStorage.setItem('socialSettings', JSON.stringify(v)); }
+                    document.getElementById('saveSocialBtn').addEventListener('click', ()=>{ save(collect()); if(typeof alertUser==='function'){ alertUser('সফল','সোশ্যাল লিংক সংরক্ষণ করা হয়েছে।'); } });
+                    document.getElementById('resetSocialBtn').addEventListener('click', ()=>{ localStorage.removeItem('socialSettings'); ids.forEach(k=>{ const el=document.getElementById('social'+k); if(el) el.value=''; }); if(typeof alertUser==='function'){ alertUser('সফল','সোশ্যাল লিংক রিসেট করা হয়েছে।'); } });
+                    ids.forEach(k=>{ const el=document.getElementById('social'+k); if(el){ ['input','change'].forEach(ev=> el.addEventListener(ev, ()=> save(collect())) ); } });
+                    load();
+                })();
+            </script>
+        </div>
+    </div>
+
+    <div id="home-roadmap" style="margin-top:1rem;">
+        <div class="table-card">
+            <h2>প্রকল্প রোডম্যাপ</h2>
+            <style>
+                #home-roadmap .rm-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+                #home-roadmap .rm-card { border:1px solid #e5e7eb; border-radius:12px; padding:12px; background:#fafafa }
+                #home-roadmap .rm-card input[type="text"],
+                #home-roadmap .rm-card input[type="date"],
+                #home-roadmap .rm-card textarea { height:46px; padding:10px 12px; font-size:15px; border-radius:10px; }
+                #home-roadmap .rm-card textarea { height: 90px; }
+                @media (max-width: 960px){ #home-roadmap .rm-grid{ grid-template-columns:1fr } }
+            </style>
+            <div class="rm-grid">
+                <div>
+                    <div id="rmForms"></div>
+                    <div style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap;">
+                        <button id="addRoadmapBtn" class="btn btn-primary" type="button">নতুন ধাপ যোগ করুন</button>
+                        <button id="saveRoadmapBtn" class="btn btn-primary" type="button">সেভ</button>
+                        <button id="resetRoadmapBtn" class="btn btn-secondary" type="button">রিসেট</button>
+                    </div>
+                </div>
+                <div>
+                    <div class="preview-box" style="border:1px dashed #cbd5e1; border-radius:12px; padding:12px; background:#f8fafc;">
+                        <div id="rmPreview"></div>
+                    </div>
+                </div>
+            </div>
+            <script>
+                (function(){
+                    function get(){ try{ return JSON.parse(localStorage.getItem('roadmapSettings')||'{}'); }catch(e){ return {}; } }
+                    function set(v){ localStorage.setItem('roadmapSettings', JSON.stringify(v)); }
+                    const forms = document.getElementById('rmForms');
+                    const preview = document.getElementById('rmPreview');
+                    function template(idx, d){ return `
+                        <div class="rm-card" data-index="${idx}" style="margin-top:12px;">
+                            <div style=\"display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;\">
+                                <h4 style=\"margin:0;\">ধাপ ${idx+1}</h4>
+                                <button type=\"button\" class=\"btn btn-secondary\" data-remove=\"${idx}\" style=\"background:#ef4444; border-color:#ef4444;\">মুছুন</button>
+                            </div>
+                            <input type=\"text\" data-field=\"title\" placeholder=\"শিরোনাম (যেমন: ভূমি অধিগ্রহণ)\" value=\"${(d&&d.title)||''}\" />
+                            <textarea data-field=\"desc\" placeholder=\"বিবরণ\" style=\"margin-top:8px;\">${(d&&d.desc)||''}</textarea>
+                            <input type=\"date\" data-field=\"date\" style=\"margin-top:8px;\" value=\"${(d&&d.date)||''}\" />
+                        </div>`; }
+                    function renderForms(v){ forms.innerHTML=''; (v.items||[]).forEach((it,idx)=>{ forms.insertAdjacentHTML('beforeend', template(idx,it)); }); bind(); }
+                    function renderPreview(v){
+                        const items = (v.items&&v.items.length)? v.items: [];
+                        if(items.length===0){ preview.innerHTML='<p style="color:#6b7280;">কোনো রোডম্যাপ ধাপ যোগ করা হয়নি।</p>'; return; }
+                        const list = document.createElement('ol'); list.style.margin='0'; list.style.paddingLeft='18px';
+                        items.forEach(it=>{ const li=document.createElement('li'); li.style.margin='8px 0'; li.innerHTML = `<div style=\"font-weight:600;\">${it.title||''} ${it.date?`<span style=\\"color:#64748b; font-weight:400;\\">(${it.date})</span>`:''}</div><div style=\"color:#475569;\">${it.desc||''}</div>`; list.appendChild(li); });
+                        preview.innerHTML=''; preview.appendChild(list);
+                    }
+                    function current(){ const v=get(); return { items: Array.isArray(v.items)? v.items : [] }; }
+                    function bind(){
+                        forms.querySelectorAll('.rm-card').forEach((card, idx)=>{
+                            card.querySelectorAll('[data-field]').forEach(inp=>{
+                                ['input','change'].forEach(ev=> inp.addEventListener(ev, ()=>{ const v=current(); v.items[idx][inp.dataset.field]=inp.value; set(v); renderPreview(v); }));
+                            });
+                            const rm=card.querySelector('[data-remove]'); rm&&rm.addEventListener('click', ()=>{ const v=current(); v.items.splice(idx,1); set(v); renderForms(v); renderPreview(v); });
+                        });
+                    }
+                    document.getElementById('addRoadmapBtn').addEventListener('click', ()=>{ const v=current(); v.items.push({title:'',desc:'',date:''}); set(v); renderForms(v); renderPreview(v); });
+                    document.getElementById('saveRoadmapBtn').addEventListener('click', ()=>{ const v=current(); set(v); if(typeof alertUser==='function'){ alertUser('সফল','রোডম্যাপ সংরক্ষণ করা হয়েছে।'); } });
+                    document.getElementById('resetRoadmapBtn').addEventListener('click', ()=>{ localStorage.removeItem('roadmapSettings'); renderForms({items:[]}); renderPreview({items:[]}); });
+                    // init
+                    const init = current(); renderForms(init); renderPreview(init);
+                })();
+            </script>
+        </div>
+    </div>
+
     <div id="home-projects" style="margin-top:1rem;">
         <div class="table-card">
             <h2>অন্যান্য প্রকল্প</h2>
@@ -628,7 +741,25 @@
                     function save(v){ set(v); renderPreview(v); }
                     function bindHeaderInputs(v){ els.title.value=v.title||''; els.subtitle.value=v.subtitle||''; ['input','change'].forEach(ev=>{ els.title.addEventListener(ev, ()=>{ const n=current(); n.title=els.title.value; save(n); }); els.subtitle.addEventListener(ev, ()=>{ const n=current(); n.subtitle=els.subtitle.value; save(n); }); }); }
                     function bindFormHandlers(){ formsWrap.querySelectorAll('.proj-card').forEach((card, idx)=>{ card.querySelectorAll('[data-field]').forEach(inp=>{ ['input','change'].forEach(ev=> inp.addEventListener(ev, ()=>{ const v=current(); v.items[idx][inp.dataset.field]=inp.value; save(v); })); }); const rm=card.querySelector('[data-remove]'); rm&&rm.addEventListener('click', ()=>{ const v=current(); v.items.splice(idx,1); set(v); renderForms(v); renderPreview(v); }); }); }
-                    document.getElementById('addProjectBtn').addEventListener('click', ()=>{ const v=current(); if(!Array.isArray(v.items)) v.items=[]; v.items.push({icon:'🏙️',name:'',desc:'',btn:'বিস্তারিত জানুন',href:'#contact'}); set(v); renderForms(v); renderPreview(v); });
+                    (function(){
+                        const addHandlers = () => {
+                            const btns = document.querySelectorAll('#addProjectBtn, .addProjectBtn');
+                            btns.forEach(btn => {
+                                if (!btn.dataset.bound) {
+                                    btn.addEventListener('click', ()=>{
+                                        const v=current();
+                                        if(!Array.isArray(v.items)) v.items=[];
+                                        v.items.push({icon:'🏙️',name:'',desc:'',btn:'বিস্তারিত জানুন',href:'#contact'});
+                                        set(v); renderForms(v); renderPreview(v);
+                                    });
+                                    btn.dataset.bound = 'true';
+                                }
+                            });
+                        };
+                        addHandlers();
+                        // Re-run binding when storage events update the DOM
+                        window.addEventListener('storage', (e)=>{ if(e.key==='otherProjectsSettings'){ addHandlers(); } });
+                    })();
                     document.getElementById('saveOtherProjectsBtn').addEventListener('click', ()=>{ const v=current(); set(v); if(typeof alertUser==='function'){ alertUser('সফল','অন্যান্য প্রকল্প সংরক্ষণ করা হয়েছে।'); } });
                     document.getElementById('resetOtherProjectsBtn').addEventListener('click', ()=>{ localStorage.removeItem('otherProjectsSettings'); const v={title:'',subtitle:'',items:[]}; renderForms(v); renderPreview(v); window.dispatchEvent(new StorageEvent('storage', {key:'otherProjectsSettings', newValue: null})); });
                     const initial=current(); bindHeaderInputs(initial); renderForms(initial); renderPreview(initial);

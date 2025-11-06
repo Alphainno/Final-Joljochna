@@ -29,6 +29,8 @@
                     <div class="nav-subitem" onclick="navigateTo('home','home-features')">আমাদের সুবিধা সমূহ</div>
                     <div class="nav-subitem" onclick="navigateTo('home','home-pricing')">মূল্য তালিকা</div>
                     <div class="nav-subitem" onclick="navigateTo('home','home-testimonials')">বিনিয়োগকারী মন্তব্য</div>
+                    <div class="nav-subitem" onclick="navigateTo('home','home-social')">সোশ্যাল মিডিয়া</div>
+                    <div class="nav-subitem" onclick="navigateTo('home','home-roadmap')">প্রকল্প রোডম্যাপ</div>
                     <div class="nav-subitem" onclick="navigateTo('home','home-projects')">অন্যান্য প্রকল্প</div>
                     <div class="nav-subitem" onclick="navigateTo('home','home-contact')">যোগাযোগ করুন</div>
                 </div>
