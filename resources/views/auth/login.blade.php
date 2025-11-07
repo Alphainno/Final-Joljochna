@@ -33,11 +33,9 @@
     <div class="login-head">
       <div class="brand">
         <img src="/images/Joljochna.png" alt="Logo" onerror="this.style.display='none'">
-        <h1>অ্যাডমিন লগইন</h1>
       </div>
     </div>
     <div class="login-body">
-      <div class="form-title">অ্যাডমিন লগইন</div>
       <form method="POST" action="{{ route('login.submit') }}" novalidate>
         @csrf
         <div class="mb-3">

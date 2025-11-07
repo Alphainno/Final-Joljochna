@@ -510,16 +510,7 @@
                 preview.style.display = (preview.src ? 'block' : 'none');
             }
 
-            // Initialize sidebar logo from header settings (with default fallback)
-            const sidebarLogo = document.getElementById('adminSidebarLogo');
-            const sidebarTitle = document.getElementById('adminSidebarTitle');
-            const defaultLogoPath = '/images/joljochna-default-logo.svg';
-            const sidebarSrc = headerLogoDataUrl || values.logoUrl || defaultLogoPath;
-            if (sidebarLogo && sidebarTitle) {
-                sidebarLogo.src = sidebarSrc;
-                sidebarLogo.style.display = 'block';
-                sidebarTitle.style.display = 'none';
-            }
+            // Sidebar (dashboard) logo is managed from user profile, not header settings.
 
             // Attach file change handler once
             const fileInput = document.getElementById('headerLogoFile');
@@ -585,10 +576,7 @@
             headerLogoDataUrl = '';
             const preview = document.getElementById('headerLogoPreview');
             if (preview) { preview.src = ''; preview.style.display = 'none'; }
-            const sidebarLogo = document.getElementById('adminSidebarLogo');
-            const sidebarTitle = document.getElementById('adminSidebarTitle');
-            if (sidebarLogo) { sidebarLogo.src = '/images/joljochna-default-logo.svg'; sidebarLogo.style.display = 'block'; }
-            if (sidebarTitle) { sidebarTitle.style.display = 'none'; }
+            // Do not modify dashboard logo when resetting header settings.
             alertUser('রিসেট', 'ডিফল্ট হেডার সেটিংস পুনরুদ্ধার করা হয়েছে।');
         }
 
@@ -633,20 +621,7 @@
             if (cta) cta.setAttribute('href', getVal('ctaHref', '#contact'));
             if (ctaText) ctaText.textContent = getVal('ctaText', ctaText.textContent || '');
 
-            // Live-update sidebar logo as admin edits header settings (fallback to default)
-            const sidebarLogo = document.getElementById('adminSidebarLogo');
-            const sidebarTitle = document.getElementById('adminSidebarTitle');
-            const srcFromFields = (function(){
-                const filePreview = headerLogoDataUrl;
-                const urlField = document.getElementById('logoUrl');
-                const urlVal = urlField ? urlField.value : '';
-                return filePreview || urlVal || '/images/joljochna-default-logo.svg';
-            })();
-            if (sidebarLogo && sidebarTitle) {
-                sidebarLogo.src = srcFromFields;
-                sidebarLogo.style.display = 'block';
-                sidebarTitle.style.display = 'none';
-            }
+            // Dashboard logo is independent; do not tie it to header fields.
         }
 
         // Footer settings
@@ -1051,6 +1026,37 @@
         };
 
 
+        // Profile Logo utilities (Dashboard + Avatar)
+        const PROFILE_LOGO_KEY = 'dashboardProfileLogo';
+        const PROFILE_LOGO_DEFAULT = '/images/Joljochna.png';
+
+        function getProfileLogo() {
+            try { return localStorage.getItem(PROFILE_LOGO_KEY) || PROFILE_LOGO_DEFAULT; } catch (e) { return PROFILE_LOGO_DEFAULT; }
+        }
+
+        function setProfileLogo(src) {
+            try { localStorage.setItem(PROFILE_LOGO_KEY, src); } catch (e) {}
+            applyProfileLogo();
+        }
+
+        function applyProfileLogo() {
+            var src = getProfileLogo();
+            // Update sidebar (dashboard) logo
+            var sLogo = document.getElementById('adminSidebarLogo');
+            var sTitle = document.getElementById('adminSidebarTitle');
+            if (sLogo) {
+                sLogo.src = src;
+                sLogo.style.display = 'block';
+            }
+            if (sTitle) { sTitle.style.display = 'none'; }
+            // Update header user avatar image (if present)
+            var avatarImg = (function(){
+                var btn = document.getElementById('userMenuBtn');
+                return btn ? btn.querySelector('img') : null;
+            })();
+            if (avatarImg) avatarImg.src = src;
+        }
+
         // Initial setup on window load
         window.onload = function() {
             updateCurrentDate();
@@ -1058,6 +1064,86 @@
             showTab('overview');
             // Populate header settings form if present
             loadHeaderSettings();
+
+            // Apply profile logo to sidebar and avatar at startup
+            applyProfileLogo();
+
+            // Helper to choose and set profile (dashboard) logo from avatar dropdown
+            window.openProfileLogoEditor = function(){
+                try {
+                    // Close dropdown if open
+                    var dd = document.getElementById('userDropdown');
+                    var btn = document.getElementById('userMenuBtn');
+                    if (dd) dd.classList.remove('open');
+                    if (btn) btn.setAttribute('aria-expanded','false');
+
+                    // Create a transient file input to pick an image
+                    var input = document.createElement('input');
+                    input.type = 'file';
+                    input.accept = 'image/*';
+                    input.style.display = 'none';
+                    document.body.appendChild(input);
+                    input.addEventListener('change', function(e){
+                        var file = e.target.files && e.target.files[0];
+                        if (!file) { document.body.removeChild(input); return; }
+                        var reader = new FileReader();
+                        reader.onload = function(){
+                            // Compress to fit in localStorage (limit ~5MB); resize to max 256x256
+                            var img = new Image();
+                            img.onload = function(){
+                                try {
+                                    var maxSide = 256;
+                                    var w = img.width, h = img.height;
+                                    if (w > h && w > maxSide) { h = Math.round(h * (maxSide / w)); w = maxSide; }
+                                    else if (h > w && h > maxSide) { w = Math.round(w * (maxSide / h)); h = maxSide; }
+                                    else if (w > maxSide) { h = Math.round(h * (maxSide / w)); w = maxSide; }
+                                    var canvas = document.createElement('canvas');
+                                    canvas.width = w; canvas.height = h;
+                                    var ctx = canvas.getContext('2d');
+                                    ctx.drawImage(img, 0, 0, w, h);
+                                    var dataUrl = canvas.toDataURL('image/png', 0.9);
+                                    setProfileLogo(dataUrl);
+                                    alertUser('সফল', 'ড্যাশবোর্ড লোগো আপডেট হয়েছে।');
+                                } catch (err) {
+                                    alertUser('ত্রুটি', 'লোগো সংরক্ষণ করা যায়নি। অনুগ্রহ করে ছোট একটি ছবি ব্যবহার করুন।');
+                                } finally {
+                                    document.body.removeChild(input);
+                                }
+                            };
+                            img.onerror = function(){
+                                document.body.removeChild(input);
+                                alertUser('ত্রুটি', 'ছবি লোড করা যায়নি। অন্য একটি ছবি চেষ্টা করুন।');
+                            };
+                            img.src = reader.result;
+                        };
+                        reader.readAsDataURL(file);
+                    }, { once: true });
+                    input.click();
+                } catch(e) {}
+            };
+
+            // User menu dropdown toggle
+            (function(){
+                var btn = document.getElementById('userMenuBtn');
+                var dd = document.getElementById('userDropdown');
+                if (!btn || !dd) return;
+                function closeMenu(){
+                    dd.classList.remove('open');
+                    btn.setAttribute('aria-expanded','false');
+                }
+                btn.addEventListener('click', function(e){
+                    e.stopPropagation();
+                    var open = dd.classList.toggle('open');
+                    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+                });
+                document.addEventListener('click', function(e){
+                    if (!dd.classList.contains('open')) return;
+                    if (!dd.contains(e.target) && e.target !== btn) closeMenu();
+                });
+                document.addEventListener('keydown', function(e){
+                    if (e.key === 'Escape') closeMenu();
+                });
+            })();
 
             // Keyboard accessibility for sidebar items with submenus
             document.querySelectorAll('.nav-item[role="button"]').forEach(item => {

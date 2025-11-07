@@ -1,6 +1,6 @@
  <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
-                <h1 id="adminSidebarTitle">জলজোছনা</h1>
+                <img id="adminSidebarLogo" class="sidebar-logo" src="/images/Joljochna.png" alt="Sidebar Logo" onerror="this.src='/images/Joljochna.png'">
                 <button class="toggle-btn" onclick="toggleSidebar()">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="3" y1="12" x2="21" y2="12"></line>
